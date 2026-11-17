@@ -55,13 +55,14 @@ SDK_SHA256 = {
 }
 
 BOARD = "fm1"                       # fm1 (default) or smk37: BOARD env or --board
-BOARD_PREFIX = {"fm1": "FM-1_95", "smk37": "SMK-37 Pro_95"}   # identity: prefix + minor (0: a dev build)
+BOARD_PREFIX = {"fm1": "FM-1_", "smk37": "SMK-37 Pro_"}   # identity: prefix + IDENTITY_NUM
+IDENTITY_NUM = "1812"               # FM-1_1812: the identity registered with the FM-1 Firmware Hub, every build
 BOARD_DEFS = {"fm1": [], "smk37": ["-DBOARD_SMK37=1"]}
 MODELS = {"pro": "SMK-37 Pro", "elite": "SMK-37 Elite", "mke": "MKE-P37"}   # smk37: one keyboard, three names
 DATA_FAMILY = "CONDUCT"              # the SMK store's owner tag (store.h): 1..7 of A-Z 0-9. Your fork: your own
 SCREEN_NAME = "CONDUCTOR"              # the update loader's screen (FM-1, ldr_screen.c): the name and its colour (RGB565)
 SCREEN_COLOUR = 0xFE8C              # warm gold, #FFD060
-PRODUCT = "FM-1_950"                # CONDUCTOR: 95N (Dinghy is 99N)
+PRODUCT = "FM-1_1812"               # CONDUCTOR on the FM-1 Firmware Hub
 VERSION = None                      # APP_VER for release builds
 
 
@@ -298,7 +299,7 @@ def mmio_check():
 def main():
     global PRODUCT, VERSION, BOARD, APP_SLOT
     ap = argparse.ArgumentParser()
-    ap.add_argument("--release", metavar="X.Y", help="release build: identity FM-1_99Y, version string X.Y")
+    ap.add_argument("--release", metavar="X.Y", help="release build: version string X.Y (identity FM-1_1812)")
     ap.add_argument("--board", choices=sorted(BOARD_PREFIX), default=None,
                     help="target board: fm1 (default) or smk37 (default: $BOARD, else fm1)")
     ap.add_argument("--model", choices=sorted(MODELS), default=None,
@@ -318,13 +319,12 @@ def main():
         BOARD_DEFS[BOARD] = [*BOARD_DEFS[BOARD], f'-DSMK_MODEL="{MODELS[model]}"']
         BOARD_PREFIX[BOARD] = BOARD_PREFIX[BOARD].replace(MODELS["pro"], MODELS[model])
         suffix += "-" + model
-    PRODUCT = BOARD_PREFIX[BOARD] + "0"
+    PRODUCT = BOARD_PREFIX[BOARD] + IDENTITY_NUM
     name = f"conductor{suffix}.fwsc"
     if a.release:                   # one digit each: the identity has room for two (X.Y; a .Z only in the text)
         m = re.fullmatch(r"(\d)\.(\d)(\.\d)?(-[A-Za-z0-9]+)?", a.release)
         if not m:
             raise SystemExit(f"--release {a.release}: use X.Y, X.Y.Z or X.Y-suffix, one digit each")
-        PRODUCT = BOARD_PREFIX[BOARD] + m[2]
         VERSION = m[1] + "." + m[2] + (m[3] or "")
         name = f"conductor-{a.release}{suffix}.fwsc"
     fm1pkg_make.SDK = a.sdk

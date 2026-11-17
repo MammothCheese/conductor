@@ -70,8 +70,8 @@ has the full list.
 
 Download the `.fwsc` from [Releases](https://github.com/MammothCheese/conductor/releases), or build it on GitHub
 (Actions, `release.yml`) or on Linux (see [docs/DINGHY.md](docs/DINGHY.md)). Install it with **M-Flasher** (back up the
-whole flash first) or `python tools/fm1_install.py build/conductor.fwsc`. The FM-1 then reports itself as `FM-1_95N`
-(CONDUCTOR, release N).
+whole flash first) or `python tools/fm1_install.py build/conductor.fwsc`. The FM-1 then reports itself as `FM-1_1812`
+(CONDUCTOR).
 
 **USB rescue:** hold **OCT-** while switching on, then install again. **Going back:** restore your M-Flasher backup, or
 install M-VAVE's official `FM-1.fwsc`.
