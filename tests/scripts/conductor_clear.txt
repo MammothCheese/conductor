@@ -1,0 +1,40 @@
+# CONDUCTOR: swing 4 and humanise 3 on the song page; MIX changed (the start-up piece's violins +3 dB, horns mp -9 dB,
+# and the low winds ff +2); the violins wide vibrato and solo; the bass drum slot muted; REC held, REC again: everything
+# cleared. After: swing and humanise off; MIX every section mf at 0 dB, the concert hall, the metronome off at 5; the
+# violins section, vibrato normal; no drum slot muted
+3000 btn 7
+3100 btn 7
+3200 enc 0 6
+3300 enc 2 4
+3400 enc 0 1
+3500 enc 2 3
+3600 shot
+3700 btn 7
+3800 btn 7
+3900 enc 0 8
+4000 enc 2 3
+4100 enc 3 2
+4200 shot
+4300 btn 2
+4400 enc 3 1
+4500 btn 10
+4700 shot
+4800 btn 5
+4900 btn 10
+5100 shot
+5200 btn 8
+5300 btndown 13
+7000 btnup 13
+7100 btn 13
+7400 btn 7
+7500 btn 7
+7700 shot
+7800 btn 7
+7900 btn 8
+8000 btn 7
+8200 shot
+8300 btn 2
+8500 shot
+8600 btn 5
+8800 shot
+8900 end

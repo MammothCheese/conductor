@@ -1,0 +1,21 @@
+# CONDUCTOR: ARP's messages say what each means: the violins' page (SOLO: ONE PLAYER, TACET: NONE, TUTTI: WHOLE
+# SECTION, at the bottom); the orchestra (at the top); the curve page's footer (SELECT start shape)
+3000 btn 2
+3100 btn 10
+3300 shot
+3400 btn 10
+3600 shot
+3700 btn 10
+3900 shot
+4000 btn 8
+4100 btn 10
+4300 shot
+4400 btn 10
+4500 btn 10
+4600 shot
+4700 btn 2
+4800 btn 6
+4900 btn 6
+5000 btn 6
+5200 shot
+5300 end

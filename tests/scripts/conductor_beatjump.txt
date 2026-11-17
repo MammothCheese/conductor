@@ -1,0 +1,27 @@
+# CONDUCTOR: ARP + SELECT, a beat a click on the editing pages. The violins' roll: SELECT one step (step 2); ARP held,
+# SELECT +1 (beat 2), +2 (beat 4), -1 (beat 3); ARP let go (no rest written); SELECT +2 (inside beat 3); ARP held,
+# SELECT -1 (beat 3's start), -1 (beat 2); let go; the music page; ARP held, SELECT +3 (beat 1 of bar 2)
+3000 btn 6
+3100 enc 0 1
+3200 shot
+3300 btndown 10
+3400 enc 0 1
+3500 shot
+3600 enc 0 2
+3700 shot
+3800 enc 0 -1
+3900 btnup 10
+4000 shot
+4100 enc 0 2
+4200 btndown 10
+4300 enc 0 -1
+4400 shot
+4500 enc 0 -1
+4600 btnup 10
+4700 shot
+4800 btn 6
+4900 btndown 10
+5000 enc 0 3
+5100 btnup 10
+5300 shot
+5400 end

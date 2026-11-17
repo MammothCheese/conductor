@@ -1,0 +1,33 @@
+# CONDUCTOR: recording over two patterns. Everything cleared; the violins' A made 2 bars; REC, PLAY; notes into A;
+# PRESETS to B while A plays (it waits: "NEXT: B"); the notes go on into B once A has come round; B took A's 2 bars.
+# Then stopped, REC off: the keys write at the cursor again (step entry); REC on or playing, they only sound
+3000 btndown 13
+4700 btnup 13
+4800 btn 13
+5000 btn 6
+5100 enc 2 1
+5200 btn 13
+5400 btn 12
+5450 keys 1
+5700 keys 0
+6100 keys 16
+6400 keys 0
+6600 enc 6 1
+6700 shot
+7000 keys 128
+7300 keys 0
+8400 keys 512
+8700 keys 0
+9100 keys 1
+9400 keys 0
+10000 shot
+10200 btn 12
+10300 btn 13
+10400 keys 16
+10500 keys 0
+10600 keys 128
+10700 keys 0
+10900 shot
+11000 enc 6 -1
+11200 shot
+11300 end

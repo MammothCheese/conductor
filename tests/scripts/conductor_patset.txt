@@ -1,0 +1,19 @@
+# CONDUCTOR: a part's settings a pattern. The violins' page on A: KNOB 1 expression ff, KNOB 2 vibrato wide, KNOB 3
+# balance -6 dB; PRESETS: B (its own: mf, normal, 0 dB, a section); ARP: B solo; PRESETS back to A (ff, wide, -6 dB,
+# a section); the orchestra (A's); MIX (A's)
+3000 btn 2
+3100 enc 2 2
+3200 enc 3 1
+3300 enc 4 -6
+3500 shot
+3600 enc 6 1
+3800 shot
+3900 btn 10
+4100 shot
+4200 enc 6 -1
+4400 shot
+4500 btn 8
+4700 shot
+4800 btn 7
+5000 shot
+5100 end

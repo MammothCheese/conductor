@@ -1,0 +1,19 @@
+# CONDUCTOR drum machine: SELECT the snare slot, ALGORITHM its sound (SNARE 2, then TOMS: tuned with KNOB 2);
+# SELECT the cymbal slot (CYMBAL 1, ALGORITHM: CYMBAL 2 and back); OCT+ the next page; the kit playing
+3000 btn 5
+3100 enc 0 3
+3300 shot
+3400 enc 1 1
+3600 shot
+3700 enc 1 1
+3800 enc 3 -3
+4000 shot
+4100 enc 0 -2
+4200 enc 1 1
+4400 shot
+4500 enc 1 -1
+4600 btn 1
+4800 shot
+4900 btn 12
+6500 shot
+6600 end

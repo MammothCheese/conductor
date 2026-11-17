@@ -1,0 +1,18 @@
+# SMK-37: velocity on the keys, a pad, an outer key, the pitch wheel bent up and back
+2200 vel 40
+2300 keys 0x80
+2700 keys 0
+2800 vel 127
+2900 keys 0x80
+3300 keys 0
+3400 pad 8 100
+3500 shot
+3800 pad 8 0
+4000 xkey 0 90
+4400 xkey 0 0
+4600 keys 0x80
+4700 wheel 0 800
+5000 wheel 0 1000
+5300 wheel 0 535
+5600 keys 0
+6500 end

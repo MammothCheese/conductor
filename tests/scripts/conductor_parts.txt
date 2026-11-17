@@ -1,0 +1,28 @@
+# CONDUCTOR: the orchestra playing (a playing part's dot big); the violins' page (KNOB 1 expression f, KNOB 2 vibrato
+# wide, KNOB 3 balance -3 dB, PRESETS: pattern B; the patterns A-J, empty ones pale); MIX: SELECT the low winds, the
+# keys play them; the song page: SELECT 3/4, REC asks, REC again changes it; the orchestra with the low winds chosen
+3000 btn 12
+3500 shot
+3700 btn 12
+3800 btn 2
+3900 enc 2 1
+4000 enc 3 1
+4100 enc 4 -3
+4200 enc 6 1
+4400 shot
+4500 btn 8
+4600 btn 7
+4700 enc 0 -2
+4800 keys 1
+4900 keys 0
+5000 shot
+5100 btn 7
+5200 enc 0 -1
+5400 shot
+5500 btn 13
+5700 shot
+5800 btn 13
+6000 shot
+6100 btn 7
+6300 shot
+6400 end

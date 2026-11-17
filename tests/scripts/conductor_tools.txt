@@ -1,0 +1,52 @@
+# CONDUCTOR: KNOB 3 on the orchestra transposes live (+2, the header shows it; back to 0); the violins' roll: ARP +
+# KNOB 4 nudges the first note a step later, ARP + REC undoes it; the horns' music page: a hairpin from their curve;
+# MIX: the CLICK row (count-in and while recording); REC, PLAY: a bar's count-in, then it plays; the song page:
+# swing 3, humanise 2, tap tempo: four taps 600 ms apart (100 BPM)
+3000 enc 4 2
+3200 shot
+3300 enc 4 -2
+3400 btn 6
+3500 btndown 10
+3600 enc 5 1
+3700 btnup 10
+3800 shot
+3900 btndown 10
+4000 btn 13
+4100 btnup 10
+4200 shot
+4300 btn 4
+4400 btn 4
+4500 btn 6
+4600 btn 6
+4800 shot
+4900 btn 8
+5000 btn 7
+5200 enc 0 6
+5300 enc 2 2
+5400 shot
+5500 btn 8
+5600 btn 13
+5800 btn 12
+6000 shot
+7000 shot
+8200 shot
+8300 btn 12
+8400 btn 13
+8500 btn 7
+8600 btn 7
+8700 enc 0 6
+8800 enc 2 3
+8900 enc 0 1
+9000 enc 2 2
+9100 enc 0 1
+9200 shot
+9300 keys 1
+9350 keys 0
+9900 keys 1
+9950 keys 0
+10500 keys 1
+10550 keys 0
+11100 keys 1
+11150 keys 0
+11300 shot
+11400 end

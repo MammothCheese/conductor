@@ -1,0 +1,32 @@
+# CONDUCTOR: the song page's eight time signatures; 6/8 chosen (SELECT), REC asks, REC again changes it (the tempo
+# kept as the same speed: 120 -> 80 dotted quarters); the violins' roll in 6/8 (beats of six 16ths), notes written;
+# the music in 6/8 (8ths beamed in threes, tied across the beat); played
+3000 btn 7
+3400 btn 7
+3600 enc 0 4
+3700 btn 13
+3800 shot
+3900 btn 13
+4100 shot
+4200 btn 7
+4300 btn 6
+4400 keys 1
+4450 keys 0
+4500 keys 16
+4550 keys 0
+4600 keys 128
+4650 keys 0
+4700 keys 512
+4750 keys 0
+4800 keys 2048
+4850 keys 0
+4900 keys 128
+4950 keys 0
+5000 keys 16
+5050 keys 0
+5300 shot
+5400 btn 6
+5600 shot
+5700 btn 12
+7200 shot
+7300 end

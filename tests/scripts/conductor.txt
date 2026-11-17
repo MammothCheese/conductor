@@ -1,0 +1,40 @@
+# CONDUCTOR: the orchestra playing (pattern letters boxed); the high strings' roll following the music page by page;
+# a chord (C E G) written at the cursor and made longer with KNOB2; the music, the dotted box on the cursor's notes;
+# live recording (REC, PLAY, a few notes); the Composer (SEQ); REC held, then REC again: everything cleared, song A = A
+3100 shot
+3200 btn 12
+4500 shot
+4700 btn 2
+4900 btn 6
+8200 shot
+8300 btn 12
+8500 enc 0 2
+8700 keys 18560
+8800 keys 0
+8900 enc 0 -4
+9000 enc 3 4
+9200 shot
+9400 btn 6
+9600 shot
+9800 btn 6
+10000 btn 13
+10100 enc 1 1
+10200 btn 12
+10600 keys 512
+11100 keys 0
+11500 keys 4096
+11700 keys 0
+12300 shot
+12400 btn 12
+12500 btn 13
+12700 btn 8
+12800 btn 11
+13000 shot
+13200 btn 8
+13300 btndown 13
+15000 btnup 13
+15050 shot
+15100 btn 13
+15200 btn 11
+15400 shot
+15600 end

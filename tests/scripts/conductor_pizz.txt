@@ -1,0 +1,21 @@
+# CONDUCTOR: pizzicato (the strings only): the violins' roll, ALGORITHM to PIZZICATO, four notes written (a ring on
+# each on the roll); the music ("pizz."); the oboes' roll: ALGORITHM goes regular .. marcato, no pizzicato
+3000 enc 6 1
+3100 btn 6
+3200 enc 1 5
+3300 keys 1
+3350 keys 0
+3450 keys 16
+3500 keys 0
+3600 keys 128
+3650 keys 0
+3750 keys 512
+3800 keys 0
+4000 shot
+4100 btn 6
+4300 shot
+4400 btn 3
+4500 btn 6
+4600 enc 1 5
+4800 shot
+4900 end

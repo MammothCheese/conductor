@@ -1,0 +1,22 @@
+# CONDUCTOR live recording on the grid: into the violins' empty pattern B while it plays (a 16th = 134 ms): C two
+# steps, E one, G four, A two (each pressed a little off the beat); the roll mid-way (G growing as it is held),
+# then the music page; each note starts and ends on the nearest step
+3000 enc 6 1
+3100 btn 6
+3200 btn 13
+3500 btn 12
+3530 keys 1
+3790 keys 0
+3830 keys 16
+3950 keys 0
+4090 keys 128
+4400 shot
+4620 keys 0
+4660 keys 512
+4920 keys 0
+5300 shot
+5400 btn 12
+5500 btn 13
+5600 btn 6
+5800 shot
+5900 end

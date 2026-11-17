@@ -1,0 +1,20 @@
+# CONDUCTOR: recorded expression. Playing with REC on, KNOB 1 on the orchestra page records the violins' expression
+# for one pass of pattern A (down, then up), written as A's curve; then stopped, its curve page
+3100 btn 12
+3150 btn 13
+3200 enc 2 -4
+3700 enc 2 -4
+4200 enc 2 -4
+4600 shot
+5000 enc 2 4
+5500 enc 2 6
+6000 enc 2 6
+6500 enc 2 2
+7800 shot
+8000 btn 12
+8100 btn 13
+8300 btn 6
+8400 btn 6
+8500 btn 6
+8800 shot
+9000 end

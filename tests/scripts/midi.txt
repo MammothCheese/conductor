@@ -1,0 +1,19 @@
+# MIDI in: USB, the TRS jack, a clock at 96 BPM with START / STOP, the channel (PRESETS) filtering
+2200 midi 0x90 60 100
+2600 midi 0x80 60 0
+2800 trs 0x90 64 90
+3200 trs 0x80 64 0
+3000 clock 96 96
+3000 midi 0xFA 0 0
+4500 shot
+5000 enc 6 3
+5200 trs 0x90 67 100
+5400 trs 0x80 67 0
+5500 trs 0x92 72 100
+5700 trs 0x82 72 0
+5800 shot
+6000 midi 0xFC 0 0
+6100 keys 1
+6300 keys 0
+8000 shot
+8500 end

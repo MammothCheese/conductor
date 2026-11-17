@@ -1,0 +1,22 @@
+# CONDUCTOR: REC held asks with a big card (any other button keeps everything); the music page playing (its moving
+# line, the knobs' guide under it); MIX's hall row (the rooms by name)
+3000 btndown 13
+4700 btnup 13
+4900 shot
+5000 btn 7
+5200 shot
+5300 btn 7
+5400 btn 12
+5500 btn 6
+5600 btn 6
+6300 shot
+6700 shot
+7100 shot
+7300 btn 12
+7400 btn 8
+7500 btn 7
+7600 enc 0 7
+7800 shot
+7900 enc 2 1
+8100 shot
+8200 end

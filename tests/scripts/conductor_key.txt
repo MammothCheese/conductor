@@ -1,0 +1,45 @@
+# CONDUCTOR: GLO three times: the KEY page (C major); SELECT +2: D major (the notation; REC to move the music); REC,
+# REC: the music moved to D; KNOB 1 scale lock on, KNOB 2 the keys' lights on; an F key played (locked to E, lit gold);
+# the violins' music in D (two sharps); ALGORITHM: a trill, then a tremolo; the roll's marks; the violins' page:
+# KNOB 4 con sordino; the orchestra: ARP held, listening alone; PLAY, SEQ held: the song ends at its end, the last
+# chord held, then it stops
+3000 btn 7
+3100 btn 7
+3200 btn 7
+3400 shot
+3500 enc 0 2
+3700 shot
+3800 btn 13
+3900 btn 13
+4100 shot
+4200 enc 2 1
+4300 enc 3 1
+4400 keys 1
+4500 shot
+4600 keys 0
+4700 btn 7
+4800 btn 6
+4900 btn 6
+5100 shot
+5200 enc 1 7
+5300 enc 0 4
+5400 enc 1 -1
+5600 shot
+5700 btn 6
+5800 btn 6
+6000 shot
+6100 btn 2
+6200 enc 5 1
+6400 shot
+6500 btn 8
+6600 btndown 10
+7300 shot
+7400 btnup 10
+7600 shot
+7700 btn 12
+8000 btndown 11
+8800 btnup 11
+9000 shot
+24500 shot
+27000 shot
+27500 end

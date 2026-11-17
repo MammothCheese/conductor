@@ -1,0 +1,36 @@
+# CONDUCTOR: orchestral terms: the violins' page (tutti), ARP: solo, tacet; the song page (PERFORMANCE, the tempo
+# marked Allegro), KNOB 4 on the orchestra to 70 (Andante); the Composer (PIECE); ARP held (SECTIONAL); PLAY, SEQ held
+# (FINE - FERMATA); the roll's footer (K3 dynamic)
+3000 btn 2
+3200 shot
+3300 btn 10
+3500 shot
+3600 btn 10
+3800 shot
+3900 btn 10
+4000 btn 8
+4100 btn 7
+4200 btn 7
+4400 shot
+4500 btn 8
+4600 enc 5 -50
+4700 btn 7
+4800 btn 7
+5000 shot
+5100 btn 7
+5200 btn 7
+5300 btn 8
+5400 btn 11
+5700 shot
+5800 btn 11
+6000 btndown 10
+6700 shot
+6800 btnup 10
+6900 btn 12
+7200 btndown 11
+8000 btnup 11
+8100 shot
+8200 btn 12
+8300 btn 6
+8500 shot
+8600 end

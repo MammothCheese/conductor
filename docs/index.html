@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONDUCTOR for the M-VAVE FM-1</title>
+<meta name="description" content="Custom firmware that turns the M-VAVE FM-1 into a pocket orchestra you compose for and conduct: strings, woodwinds, brass and percussion, patterns, a score page and a concert hall.">
+<style>
+:root {
+  --paper: #F3EAD3; --card: #FBF6E8; --ink: #2B2018; --ink2: #7A6856; --rule: #BEAC8E; --faint: #E4D8BE;
+  --wine: #701020; --wine2: #8E2232; --gold: #BA9234; --goldl: #F2CA60;
+  --serif: Georgia, "DejaVu Serif", "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 var(--sans); }
+a { color: var(--wine); }
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px; }
+header { position: sticky; top: 0; z-index: 5; background: rgba(243, 234, 211, .94); backdrop-filter: blur(4px); border-bottom: 1px solid var(--rule); }
+nav { display: flex; align-items: center; justify-content: space-between; height: 54px; }
+.brand { font: 700 16px var(--serif); letter-spacing: 3px; color: var(--ink); text-decoration: none; }
+.brand::before { content: "\266A"; color: var(--wine); margin-right: 8px; }
+nav ul { display: flex; gap: 16px; list-style: none; margin: 0; padding: 0; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 14px; }
+nav ul a:hover { color: var(--wine); }
+.hero { padding: 56px 0 44px; max-width: 760px; }
+.kicker { color: var(--gold); font: 600 12px var(--mono); letter-spacing: 2px; text-transform: uppercase; }
+h1 { font: 700 clamp(30px, 4.4vw, 46px)/1.12 var(--serif); margin: 10px 0 16px; }
+h1 em { font-style: italic; color: var(--wine); }
+h2 { font: 700 27px var(--serif); margin: 0 0 6px; }
+h3 { font: 700 19px var(--serif); margin: 26px 0 8px; }
+.lede { color: var(--ink2); font-size: 17.5px; margin: 0 0 22px; }
+.btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; margin: 0 10px 10px 0; }
+.btn.primary { background: var(--wine); color: var(--card); font-weight: 600; }
+.btn.ghost { border: 1px solid var(--wine); color: var(--wine); }
+.note { color: var(--ink2); font-size: 13.5px; }
+.screen { text-align: center; }
+.screen img, .shot img { width: min(100%, 360px); image-rendering: pixelated; border: 10px solid var(--ink); border-radius: 12px; box-shadow: 0 0 0 1px var(--rule), 0 8px 24px rgba(43, 32, 24, .18); background: var(--paper); }
+.screen p, .shot p { color: var(--ink2); font-size: 13px; margin: 8px 0 0; }
+section { padding: 46px 0; border-top: 1px solid var(--rule); }
+.sub { color: var(--ink2); margin: 0 0 22px; max-width: 780px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--faint); border-radius: 10px; padding: 14px 16px; }
+.card h4 { margin: 0 0 4px; font: 600 14px var(--mono); color: var(--wine); letter-spacing: 1px; }
+.card p { margin: 0; font-size: 14.5px; }
+.steps { counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.steps .card { counter-increment: s; }
+.steps .card h4::before { content: counter(s) "  "; color: var(--gold); }
+.split { display: grid; grid-template-columns: 1fr 340px; gap: 34px; align-items: start; }
+.split.rev { grid-template-columns: 340px 1fr; }
+.shot { text-align: center; }
+.shot img { width: 100%; max-width: 340px; border-width: 8px; }
+table.t { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 6px 0 4px; }
+table.t td, table.t th { padding: 7px 9px; border-bottom: 1px solid var(--faint); vertical-align: top; text-align: left; }
+table.t th { font: 600 12px var(--mono); letter-spacing: 1px; color: var(--ink2); text-transform: uppercase; }
+table.t td:first-child { white-space: nowrap; width: 1%; font-weight: 600; }
+table.t td:last-child { color: var(--ink); }
+kbd { font: 600 12.5px var(--mono); background: var(--card); border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.dyn { font: italic 700 17px var(--serif); color: var(--wine); }
+.it { font-family: var(--serif); font-style: italic; font-weight: 700; color: var(--wine); }
+.tip { background: var(--card); border-left: 4px solid var(--gold); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0; font-size: 15px; }
+.pill { display: inline-block; background: var(--wine); color: var(--card); border-radius: 12px; font: 600 12px var(--mono); padding: 1px 9px; margin-right: 4px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.gallery figure { margin: 0; text-align: center; }
+.gallery img { width: 100%; image-rendering: pixelated; border: 5px solid var(--ink); border-radius: 8px; }
+.gallery figcaption { font-size: 12.5px; color: var(--ink2); margin-top: 4px; }
+footer { color: var(--ink2); font-size: 13px; padding: 30px 0 50px; border-top: 1px solid var(--rule); }
+footer a { color: var(--ink2); }
+@media (max-width: 820px) { .split, .split.rev { grid-template-columns: 1fr; } nav ul { display: none; } .hero { padding-top: 30px; } }
+</style>
+</head>
+<body id="top">
+<header><div class="wrap"><nav>
+  <a class="brand" href="#top">CONDUCTOR</a>
+  <ul>
+    <li><a href="#orchestra">The orchestra</a></li>
+    <li><a href="#writing">Writing music</a></li>
+    <li><a href="#expression">Expression</a></li>
+    <li><a href="#song">Pieces</a></li>
+    <li><a href="#reference">All controls</a></li>
+    <li><a href="https://github.com/MammothCheese/conductor">GitHub</a></li>
+  </ul>
+</nav></div></header>
+
+<main class="wrap">
+
+<div class="hero">
+  <div>
+    <div class="kicker">Custom firmware for the M-VAVE FM-1 &middot; free and open source</div>
+    <h1>A pocket orchestra, and you are the composer, musician and <em>conductor</em>.</h1>
+    <p class="lede">CONDUCTOR turns the FM-1 into a small symphony orchestra: strings, woodwinds,
+    brass and percussion. Write parts, shape emphasis, chain the patterns into a piece and hear it all in a concert hall.</p>
+    <a class="btn primary" href="https://github.com/MammothCheese/conductor/releases/latest">Download</a>
+    <a class="btn ghost" href="https://github.com/MammothCheese/conductor#install">How to install</a>
+    <a class="btn ghost" href="https://github.com/MammothCheese/conductor">Source</a>
+    <p class="note">Press <kbd>PLAY</kbd> as soon as it starts: a short overture is loaded for you to showcase the possibilities of the firmware. It is also in <b>SAVE 1</b>, so you can load it again later (until you
+    save something of your own there).</p>
+  </div>
+</div>
+
+<section id="orchestra">
+  <h2>The orchestra</h2>
+  <p class="sub">The orchestra is arranged as seen from the conductor’s podium: strings at the front, woodwinds
+  behind, then brass, and percussion at the back. Each melodic section has a <b>HIGH</b> and a <b>LOW</b> part.</p>
+  <div class="split">
+    <div>
+      <table class="t">
+        <tr><th>Section</th><th>High</th><th>Low</th></tr>
+        <tr><td>Strings</td><td>violins</td><td>cellos</td></tr>
+        <tr><td>Woodwinds</td><td>oboes</td><td>bassoons</td></tr>
+        <tr><td>Brass</td><td>trumpets</td><td>horns</td></tr>
+        <tr><td>Percussion</td><td colspan="2">eight drums of your choice</td></tr>
+      </table>
+      <p>Every melodic part can play up to <b>three notes at a time</b>. Switch a part to <span class="it">solo</span> to hear one player. The synthesized strings, wind and brass sounds
+      were measured from recordings of real instruments.</p>
+        <p>The seats show what is happening: a chosen section is red, a <span class="it">tacet</span> (silent) one fades, a solo part fades to its middle chair.
+  The boxed letter beside each part is the pattern it is playing (<b>A</b> to <b>J</b>); the header shows the chosen
+  section, its pattern, its marking and the tempo.</p>
+      <h3>On this page</h3>
+      <div class="grid">
+        <div class="card"><h4>SELECT</h4><p>Choose a section, from the back of the orchestra to the front.</p></div>
+        <div class="card"><h4>KNOB 1</h4><p>How strongly that section plays from <span class="dyn">pp</span> to <span class="dyn">ff</span>.</p></div>
+        <div class="card"><h4>KNOB 2</h4><p>The section’s balance in the mix, in dB.</p></div>
+        <div class="card"><h4>KNOB 3</h4><p>Transpose the whole orchestra live, a semitone at a time (not saved).</p></div>
+        <div class="card"><h4>KNOB 4</h4><p>The tempo.</p></div>
+        <div class="card"><h4>ARP</h4><p>Toggles between <span class="it">tutti</span> (the whole section), <span class="it">solo</span> (one player) and <span class="it">tacet</span> (silent). Hold it for a sectional: that part alone.</p></div>
+        <div class="card"><h4>EDIT</h4><p>Open the chosen section's pattern.</p></div>
+        <div class="card"><h4>SEQ</h4><p>The Composer, to chain patterns into a piece. Its light stays on while the Composer is on. Hold it while playing for <span class="it">Fine</span> &ndash; <span class="it">fermata</span>: the piece finishes at the end of that pattern, and the last chord is held.</p></div>
+        <div class="card"><h4>GLO</h4><p>The MIX page, then the piece page, then the KEY page, then back.</p></div>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="guide/home.png" alt="The orchestra page: the sections seated as a conductor sees them">
+      <p>The orchestra page: every section in its seat, the chosen one in red.</p>
+    </div>
+  </div>
+
+  <div class="split rev" style="margin-top:28px">
+    <div class="shot"><img src="guide/setup.png" alt="A part's page"><p>A part's page: <kbd>FX</kbd> strings, <kbd>SEL</kbd> woodwinds, <kbd>ENV</kbd> brass.</p></div>
+    <div>
+      <h3>A part's page</h3>
+      <p>Press <kbd>FX</kbd>, <kbd>SEL</kbd> or <kbd>ENV</kbd> for the strings, woodwinds or brass. The first press shows the
+      HIGH part, the next the LOW. It shows how strongly the part plays, how many players it has, its
+      vibrato and balance, and its ten patterns: the chosen one in red, ones with notes dark, empty ones pale.
+      <kbd>KNOB 1</kbd> sets its expression, <kbd>KNOB 2</kbd> its vibrato (off, light, normal, wide), <kbd>KNOB 3</kbd>
+      its balance, <kbd>KNOB 4</kbd> <span class="it">con sordino</span> (a physical mute to quieten and dampen sound, for strings and brass); <kbd>PRESETS</kbd> chooses the pattern and <kbd>ARP</kbd> switches <span class="it">tutti</span>, <span class="it">solo</span> and <span class="it">tacet</span>.</p>
+      <p>Each pattern remembers its own expression, players, vibrato and balance. Make pattern B a quiet solo and A stays
+      a full section; when the music moves from A to B, the part changes with it. </p>
+    </div>
+  </div>
+</section>
+
+<section id="writing">
+  <h2>Writing music</h2>
+  <p class="sub">Each part has ten patterns, <b>A</b> to <b>J</b>. A pattern is one bar or more, and every part loops its
+  own. Turn <kbd>PRESETS</kbd> to choose which pattern a part plays; while the music plays, the new
+  one starts when the current one comes round.</p>
+
+  <div class="split rev">
+    <div class="shot"><img src="guide/roll.png" alt="The piano roll"><p>The piano roll: the cursor is the gold column.</p></div>
+    <div>
+      <h3>The piano roll and the music</h3>
+      <p>Press <kbd>EDIT</kbd> on the orchestra page or a part's page for the <b>piano roll</b>: a keyboard down the side, notes as bars as long as they sound, the
+      cursor as a gold column. Press <kbd>EDIT</kbd> again for <b>the notation</b>: the same notes written as sheet music, on a
+      staff with clef, time signature, rests, beams and ties. Press it once more for the pattern's expression curve.</p>
+    </div>
+  </div>
+
+  <div class="split">
+    <div>
+      <h3>Writing notes</h3>
+      <div class="grid">
+        <div class="card"><h4>SELECT</h4><p>Move the cursor, step by step (each step a sixteenth note).</p></div>
+        <div class="card"><h4>ARP + SELECT</h4><p>Hold <kbd>ARP</kbd> and turn to jump a beat at a time.</p></div>
+        <div class="card"><h4>Keys</h4><p>Write at the cursor. Hold keys together for a chord. The cursor moves on when you let go.</p></div>
+        <div class="card"><h4>KNOB 2</h4><p>How long the note lasts, named as music does: <i>8th, quarter, half&hellip;</i></p></div>
+        <div class="card"><h4>KNOB 3</h4><p>The dynamic of an individual note: <span class="dyn">p mp mf f</span>.</p></div>
+        <div class="card"><h4>KNOB 4</h4><p>Move the note at the cursor up or down a semitone.</p></div>
+        <div class="card"><h4>ARP + KNOB 4</h4><p>Nudge the note a step earlier or later.</p></div>
+        <div class="card"><h4>ARP + REC</h4><p>Undo your last edits; again to redo.</p></div>
+        <div class="card"><h4>KNOB 1</h4><p>The pattern's length, in whole bars.</p></div>
+        <div class="card"><h4>ARP</h4><p>A rest: removes the note at the cursor (inside a longer note, ends it there).</p></div>
+        <div class="card"><h4>GLO twice</h4><p>Clear the whole pattern.</p></div>
+      </div>
+    </div>
+    <div class="shot"><img src="guide/music.png" alt="The music page"><p>The music page: the cursor's note in a dotted gold box.</p></div>
+  </div>
+
+  <h3>Articulations</h3>
+  <p>On the piano roll or the music page, turn <kbd>ALGORITHM</kbd> to choose how a note is played. It applies to the note
+  at the cursor and to every note you write after it, until you set it back to regular.</p>
+  <table class="t">
+    <tr><td>Staccato</td><td>Short and detached. Marked with a dot.</td></tr>
+    <tr><td>Accent</td><td>Louder, with a quicker attack. Marked &gt;.</td></tr>
+    <tr><td>Legato</td><td>Slurred smoothly into the next note, with no new attack. Marked with a slur.</td></tr>
+    <tr><td>Marcato</td><td>Strongly accented and a little short. Marked ^.</td></tr>
+    <tr><td>Pizzicato</td><td>Strings only: plucked instead of bowed, dying away by itself. Marked <span class="it">pizz.</span></td></tr>
+    <tr><td>Tremolo</td><td>Strings only: very fast bowing, a shimmering, dramatic sound. Marked with three strokes.</td></tr>
+    <tr><td>Trill</td><td>The note and the one above it in the key, in quick turns. Marked <span class="it">tr</span>.</td></tr>
+  </table>
+
+  <h3>Recording as you play</h3>
+  <p>Tap <kbd>REC</kbd>, then press <kbd>PLAY</kbd>: what you play goes into the pattern that is playing. Each note starts
+  and ends on the nearest step, so it comes out tidy, and you can watch it grow on screen while you hold it. Tap
+  <kbd>REC</kbd> again to stop recording.</p>
+  <p><b>Recording across patterns:</b> while recording, turn <kbd>PRESETS</kbd> to the next pattern. The one you are in
+  plays to its end first, then the recording carries straight on into the next, and an empty pattern takes the same
+  number of bars. Keys write notes at the cursor only when the music is stopped and <kbd>REC</kbd> is off; otherwise
+  they just play.</p>
+
+  <h3>Handy tools</h3>
+  <div class="grid">
+    <div class="card"><h4>Copy a pattern</h4><p>Press <kbd>SEQ</kbd> on any editing page: a grid of every part's patterns. Choose the part with <kbd>SELECT</kbd> and the pattern with <kbd>ALGORITHM</kbd>, press <kbd>SEQ</kbd> twice, and your pattern becomes a copy of it, with its curve and settings, so the oboes can take the violins' tune.</p></div>
+    <div class="card"><h4>Transpose</h4><p>On an editing page, <b>hold</b> <kbd>OCT-</kbd> or <kbd>OCT+</kbd> to move the whole pattern down or up an octave. A quick tap changes the keyboard's octave instead.</p></div>
+    <div class="card"><h4>A new letter</h4><p>Hold <kbd>ARP</kbd> and turn <kbd>PRESETS</kbd>: the pattern is copied into the next letter, ready for a variation.</p></div>
+  </div>
+
+  <div class="split rev" style="margin-top:28px">
+    <div class="shot"><img src="guide/drums.png" alt="The drum machine"><p>The percussion: a drum machine. <kbd>LFO</kbd> opens it.</p></div>
+    <div>
+      <h3>The percussion</h3>
+      <p>Press <kbd>LFO</kbd>. The percussion is a drum machine: eight slots as rows of steps, sharing one pattern. The
+      <b>black keys</b> choose a slot (and play it); the <b>white keys</b> turn its steps on and off for the bar on screen.
+      <kbd>OCT-</kbd> and <kbd>OCT+</kbd> turn the page. The bottom line shows the step you are on, its dynamic, and the
+      chosen slot's tuning and level.</p>
+      <p><b>Any slot can be any sound</b>: choose a slot with <kbd>SELECT</kbd> and turn <kbd>ALGORITHM</kbd>. There are
+      eleven: bass drum, cymbal 1 (clash cymbals), cymbal 2, triangle, snare 1 (an orchestral side drum), snare 2 (played
+      hard), toms and timpani 1 to 4 (C2, G2, C3 and G3 to begin with). Toms and timpani are tuned with <kbd>KNOB 2</kbd>. For a timpani roll, put a hit
+      on every step and raise the dynamic as it goes (<kbd>KNOB 3</kbd>) for a <span class="it">crescendo</span>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="expression">
+  <h2>Expression, balance and the hall</h2>
+  <p class="sub">Two different controls set how loud a section is, the way a real orchestra works.</p>
+  <div class="split">
+    <div>
+      <table class="t">
+        <tr><td>Expression</td><td>How strongly the section <b>plays</b>, from <span class="dyn">pp</span> to <span class="dyn">ff</span>. It changes the tone, not just the volume: loud brass turns brassy, loud strings brighter. A conductor shapes this.</td></tr>
+        <tr><td>Balance</td><td>Where the section sits <b>in the mix</b>, like a fader. Only the volume changes. A sound engineer sets this.</td></tr>
+      </table>
+      <p>If the trumpets are too loud, lower their <b>balance</b> and they still play <span class="dyn">f</span>, just further
+      back; lower their <b>expression</b> and they play softer and mellower.</p>
+      <h3>Curves: <span class="it">crescendo</span> and <span class="it">diminuendo</span></h3>
+      <p>Each pattern can carry an <b>expression curve</b> (the music page shows it as hairpins under the staff) that swells or fades through it: press <kbd>EDIT</kbd> three times
+      from a part's page (once from the music page). Turn <kbd>SELECT</kbd> for a ready-made shape (<span class="it">crescendo</span>,
+      <span class="it">diminuendo</span>, swell), then move its points with the knobs. Or <b>perform</b> it: with <kbd>REC</kbd> on and the music
+      playing, turn <kbd>KNOB 1</kbd> on the orchestra page, and one pass of the pattern is recorded as its curve.</p>
+    </div>
+    <div class="shot"><img src="guide/curve.png" alt="An expression curve"><p>The horns' curve in the start-up piece: quieter in bar 1, coming in from bar 2.</p></div>
+  </div>
+
+  <div class="split rev" style="margin-top:20px">
+    <div class="shot"><img src="guide/mix.png" alt="The MIX page"><p>MIX: press <kbd>GLO</kbd> on the orchestra page.</p></div>
+    <div>
+      <h3>The MIX page</h3>
+      <p>Every section in a row. Choose one with <kbd>SELECT</kbd>: <kbd>KNOB 1</kbd> its expression, <kbd>KNOB 2</kbd> its
+      balance. The keys play the section you are on, so you can hear it while you mix, and it stays chosen when you
+      go back to the orchestra page.</p>
+      <h3>The hall</h3>
+      <p>The last row is the room the orchestra plays in: <b>studio</b> (close and dry), <b>chamber</b>, <b>concert hall</b>
+      or <b>cathedral</b> (vast and ringing). Choose it with <kbd>KNOB 1</kbd> or <kbd>KNOB 2</kbd>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="song">
+  <h2>Pieces, time signatures and saving</h2>
+  <div class="split">
+    <div>
+      <h3>The Composer</h3>
+      <p>Press <kbd>SEQ</kbd> on the orchestra page. A row for each part, eight boxes each: each box plays a pattern once,
+      then the next, round and round. Put <b>A A B A</b> in the strings and <b>C D C D</b> in the brass, and you have a
+      piece with a form. A blank box carries on with the one before, and <b>X</b> is a rest, so a part can come in later.
+      <kbd>KNOB 4</kbd> turns the Composer on or off and <kbd>PRESETS</kbd> chooses one of ten pieces (PIECE A to J). <b>If patterns aren't playing as you expect, there is a good chance the Composer is on.</b></p>
+      <h3>Time signature</h3>
+      <p>Press <kbd>GLO</kbd> twice from the orchestra page for the <b>piece page</b>: the time signature: <b>2/2</b>, <b>3/8</b>, <b>2/4</b>,
+      <b>3/4</b>, <b>6/8</b>, <b>4/4</b>, <b>5/4</b> or <b>12/8</b>. Turn <kbd>SELECT</kbd> to choose and press <kbd>REC</kbd>
+      to confirm. Changing it clears every pattern, so it asks first: press <kbd>REC</kbd> again to go ahead.</p>
+      <p>The tempo (<kbd>KNOB 4</kbd> on the orchestra page) counts the beat: a quarter note, a half note in 2/2, and a
+      dotted quarter in 3/8, 6/8 and 12/8.</p>
+    </div>
+    <div class="shot"><img src="guide/composer.png" alt="The Composer"><p>The Composer: pieces from patterns.</p></div>
+  </div>
+  <div class="split rev" style="margin-top:20px">
+    <div class="shot"><img src="guide/save.png" alt="The save page"><p>Four save slots: <kbd>SAVE</kbd>.</p></div>
+    <div>
+      <h3>Key</h3>
+      <p>Press <kbd>GLO</kbd> once more after the piece page for the <b>KEY page</b>. Turn <kbd>SELECT</kbd> to choose the
+      key: the score then shows its key signature and spells its notes properly. Press <kbd>REC</kbd> twice to move the
+      music itself into the key shown. The page shows the scale on a staff and on a piano, and the keys play there, so
+      you can try it. <kbd>KNOB 1</kbd> turns on <b>scale lock</b> (only the key's notes play) and <kbd>KNOB 2</kbd>
+      lights the key's notes on the keyboard.</p>
+      <h3>Swing, humanise and tap tempo</h3>
+      <p>The piece page's <b>performance</b> row has <b>swing</b> (every second sixteenth a little later, up to a triplet feel),
+      <b>humanise</b> (each note slightly louder or softer and a touch late, like real players) and <b>tap tempo</b>:
+      choose it with <kbd>SELECT</kbd> and tap any key in time. <kbd>KNOB 1</kbd> sets swing and humanise. None of these
+      clears your patterns. The tap tempo box also shows the tempo's Italian marking, from <span class="it">Grave</span>
+      through <span class="it">Largo</span>, <span class="it">Adagio</span>, <span class="it">Andante</span>,
+      <span class="it">Moderato</span> and <span class="it">Allegro</span> to <span class="it">Presto</span>.</p>
+      <h3>Metronome and count-in</h3>
+      <p>The last row of MIX is the <b>metronome</b>: off, a one-bar count-in before you record, a tick on every beat
+      while recording, or always: choose it with <kbd>KNOB 1</kbd>. <kbd>KNOB 2</kbd> sets its level.</p>
+      <h3>Saving</h3>
+      <p>For pieces you want to keep, press <kbd>SAVE</kbd>: four slots, each the whole score. <kbd>KNOB 1</kbd>
+      chooses the slot, <kbd>REC</kbd> saves to it and <kbd>PLAY</kbd> loads it; each asks first, and the same button again
+      does it. <b>SAVE 1</b> holds the start-up piece until you save over it.</p>
+      <h3>Starting over</h3>
+      <p>Hold <kbd>REC</kbd> for a moment and a big card asks <b>CLEAR ALL?</b>. Press <kbd>REC</kbd> again to clear every
+      pattern. Swing and humanise go back to off, and the mix to the middle: every section <span class="dyn">mf</span> at
+      0 dB, the concert hall, the metronome off; every part plays <span class="it">tutti</span> with normal vibrato, and
+      nothing is <span class="it">tacet</span>; the key goes back to C major, with scale lock and the keyboard's lights off.
+      Any other button keeps everything.</p>
+      <h3>MIDI</h3>
+      <p>Play CONDUCTOR from a MIDI keyboard or a computer, over USB or the TRS jack. Channels 1 to 6 play the melodic
+      parts (strings, woodwinds, brass, high then low) and channel 10 the eight drum slots with General MIDI drum notes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="reference">
+  <h2>All controls</h2>
+
+  <h3>Anywhere</h3>
+  <table class="t">
+    <tr><td><kbd>PLAY</kbd></td><td>Start and stop.</td></tr>
+    <tr><td><kbd>REC</kbd></td><td>Tap: recording on or off. Hold, then press again: clear everything.</td></tr>
+    <tr><td><kbd>FX</kbd> <kbd>SEL</kbd> <kbd>ENV</kbd></td><td>A part's page: strings, woodwinds, brass (again: the other part).</td></tr>
+    <tr><td><kbd>LFO</kbd></td><td>The percussion's drum machine.</td></tr>
+    <tr><td><kbd>HOME</kbd></td><td>The orchestra page.</td></tr>
+    <tr><td><kbd>SAVE</kbd></td><td>The save page.</td></tr>
+    <tr><td><kbd>PRESETS</kbd></td><td>The chosen part's pattern, A to J. Hold <kbd>ARP</kbd> and turn: copy it into the new letter.</td></tr>
+    <tr><td><kbd>OCT-</kbd> <kbd>OCT+</kbd></td><td>Tap: the keyboard's octave. Hold on an editing page: the pattern down or up an octave.</td></tr>
+  </table>
+
+  <h3>The orchestra page</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>The section.</td></tr>
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></td><td>Its expression / its balance / transpose the whole orchestra live / the tempo.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td>Tap: <span class="it">tutti</span>, <span class="it">solo</span>, <span class="it">tacet</span>. Hold: a sectional, that part alone.</td></tr>
+    <tr><td><kbd>SEQ</kbd></td><td>Tap: the Composer. Hold while playing: <span class="it">Fine</span> &ndash; <span class="it">fermata</span>, the piece ends at its end with the last chord held.</td></tr>
+    <tr><td><kbd>GLO</kbd></td><td>MIX, then the piece page, then the KEY page, then back.</td></tr>
+    <tr><td><kbd>EDIT</kbd></td><td>The chosen section's pattern.</td></tr>
+  </table>
+
+  <h3>The piano roll and the music</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>The cursor (the page follows it).</td></tr>
+    <tr><td>Hold <kbd>ARP</kbd> + <kbd>SELECT</kbd></td><td>Jump a beat at a time.</td></tr>
+    <tr><td>Hold <kbd>ARP</kbd> + <kbd>KNOB 4</kbd></td><td>Nudge the note a step earlier or later.</td></tr>
+    <tr><td>Hold <kbd>ARP</kbd> + <kbd>REC</kbd></td><td>Undo your last edits (again: redo).</td></tr>
+    <tr><td><kbd>ALGORITHM</kbd></td><td>Articulation: regular, <span class="it">staccato</span>, accent, <span class="it">legato</span>, <span class="it">marcato</span>, trill (and <span class="it">pizzicato</span> and <span class="it">tremolo</span> for the strings).</td></tr>
+    <tr><td><kbd>KNOB 1</kbd></td><td>The pattern's length in bars.</td></tr>
+    <tr><td><kbd>KNOB 2</kbd></td><td>The note's length (or the next note's, on a rest).</td></tr>
+    <tr><td><kbd>KNOB 3</kbd></td><td>The dynamic.</td></tr>
+    <tr><td><kbd>KNOB 4</kbd></td><td>The note up or down a semitone.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td>A rest at the cursor (a quick tap).</td></tr>
+    <tr><td><kbd>SEQ</kbd></td><td>The copy page.</td></tr>
+    <tr><td><kbd>EDIT</kbd></td><td>Piano roll, the music, the expression curve, and back.</td></tr>
+    <tr><td><kbd>GLO</kbd> twice</td><td>Clear the pattern.</td></tr>
+  </table>
+
+  <h3>A part's page</h3>
+  <table class="t">
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td>The chosen pattern's expression / vibrato / balance.</td></tr>
+    <tr><td><kbd>KNOB 4</kbd></td><td><span class="it">Con sordino</span> on (right) or off (left): strings and brass only.</td></tr>
+    <tr><td><kbd>PRESETS</kbd></td><td>The pattern, A to J.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td><span class="it">Tutti</span>, <span class="it">solo</span>, <span class="it">tacet</span>.</td></tr>
+    <tr><td><kbd>EDIT</kbd></td><td>The piano roll.</td></tr>
+  </table>
+
+  <h3>The drum machine</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd> or black keys</td><td>The slot.</td></tr>
+    <tr><td><kbd>ALGORITHM</kbd></td><td>The slot's sound.</td></tr>
+    <tr><td>White keys</td><td>Its steps on and off.</td></tr>
+    <tr><td><kbd>OCT-</kbd> <kbd>OCT+</kbd></td><td>The page.</td></tr>
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></td><td>Length in bars / tuning (toms, timpani) / dynamic / the slot's level.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td>Mute the slot.</td></tr>
+    <tr><td><kbd>EDIT</kbd></td><td>The kit's expression curve.</td></tr>
+  </table>
+
+  <h3>The expression curve</h3>
+  <table class="t">
+    <tr><td><kbd>KNOB 1</kbd></td><td>Choose a point.</td></tr>
+    <tr><td><kbd>KNOB 2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></td><td>Its place / its level / the shape of the line after it.</td></tr>
+    <tr><td><kbd>ARP</kbd> / <kbd>SEQ</kbd></td><td>Add a point / delete one.</td></tr>
+    <tr><td><kbd>SELECT</kbd></td><td>A ready-made shape: flat, <span class="it">crescendo</span>, <span class="it">diminuendo</span>, swell.</td></tr>
+    <tr><td><kbd>GLO</kbd></td><td>The curve on or off.</td></tr>
+  </table>
+
+  <h3>MIX and saving</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>MIX: the section, the hall or the metronome.</td></tr>
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd></td><td>MIX: expression / balance (the hall: the room; the metronome: its mode / its level).</td></tr>
+    <tr><td><kbd>KNOB 1</kbd></td><td>Save page: the slot. <kbd>REC</kbd> saves, <kbd>PLAY</kbd> loads (each twice).</td></tr>
+  </table>
+
+  <h3>The piece page</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>Choose: a time signature, then swing, humanise and tap tempo.</td></tr>
+    <tr><td><kbd>REC</kbd></td><td>Change to the chosen time signature (twice: it clears every pattern).</td></tr>
+    <tr><td><kbd>KNOB 1</kbd></td><td>Swing or humanise: off, 1 to 6.</td></tr>
+    <tr><td>Keys</td><td>Tap tempo chosen: tap any key in time.</td></tr>
+    <tr><td><kbd>GLO</kbd></td><td>The KEY page.</td></tr>
+  </table>
+
+  <h3>The KEY page</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>The key, a sharp or flat at a time.</td></tr>
+    <tr><td><kbd>REC</kbd> twice</td><td>Move the music itself into the key shown.</td></tr>
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd></td><td>Scale lock / the key's notes lit on the keyboard.</td></tr>
+    <tr><td>Keys</td><td>Play, to try the key.</td></tr>
+    <tr><td><kbd>GLO</kbd></td><td>Back to the orchestra.</td></tr>
+  </table>
+
+  <h3>The Composer</h3>
+  <table class="t">
+    <tr><td><kbd>SELECT</kbd></td><td>The part's row.</td></tr>
+    <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td>The piece's length (1 to 8 boxes) / the box / the box's pattern (blank, A to J, X for a rest).</td></tr>
+    <tr><td><kbd>KNOB 4</kbd></td><td>The Composer on or off.</td></tr>
+    <tr><td><kbd>PRESETS</kbd></td><td>The piece, A to J.</td></tr>
+    <tr><td><kbd>SEQ</kbd> or <kbd>HOME</kbd></td><td>Back to the orchestra.</td></tr>
+  </table>
+
+  <h3>Every page</h3>
+  <div class="gallery">
+    <figure><img src="guide/home.png" alt=""><figcaption>The orchestra</figcaption></figure>
+    <figure><img src="guide/setup.png" alt=""><figcaption>A part's page</figcaption></figure>
+    <figure><img src="guide/roll.png" alt=""><figcaption>The piano roll</figcaption></figure>
+    <figure><img src="guide/music.png" alt=""><figcaption>The music</figcaption></figure>
+    <figure><img src="guide/curve.png" alt=""><figcaption>An expression curve</figcaption></figure>
+    <figure><img src="guide/drums.png" alt=""><figcaption>The drum machine</figcaption></figure>
+    <figure><img src="guide/copy.png" alt=""><figcaption>Copy a pattern</figcaption></figure>
+    <figure><img src="guide/mix.png" alt=""><figcaption>MIX</figcaption></figure>
+    <figure><img src="guide/song.png" alt=""><figcaption>The piece page</figcaption></figure>
+    <figure><img src="guide/key.png" alt=""><figcaption>The key</figcaption></figure>
+    <figure><img src="guide/composer.png" alt=""><figcaption>The Composer</figcaption></figure>
+    <figure><img src="guide/save.png" alt=""><figcaption>Save</figcaption></figure>
+    <figure><img src="guide/clear.png" alt=""><figcaption>Clear all?</figcaption></figure>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  CONDUCTOR is free software (GPL-3.0), built on <a href="https://github.com/zvenson/dinghy">Dinghy</a> and the
+  <a href="https://github.com/hugelton/Felucca">Felucca</a> platform. <a href="https://github.com/MammothCheese/conductor">Source</a>.<br>
+  &ldquo;M-VAVE&rdquo; and &ldquo;FM-1&rdquo; belong to their owners. Not made or endorsed by M-VAVE. Installing firmware is at your own risk.
+</div></footer>
+</body>
+</html>
