@@ -75,6 +75,7 @@ footer a { color: var(--ink2); }
 <header><div class="wrap"><nav>
   <a class="brand" href="#top">CONDUCTOR</a>
   <ul>
+    <li><a href="#inshort">In short</a></li>
     <li><a href="#orchestra">The orchestra</a></li>
     <li><a href="#writing">Writing music</a></li>
     <li><a href="#expression">Expression</a></li>
@@ -90,8 +91,7 @@ footer a { color: var(--ink2); }
   <div>
     <div class="kicker">Custom firmware for the M-VAVE FM-1 &middot; free and open source</div>
     <h1>A pocket orchestra, and you are the composer, musician and <em>conductor</em>.</h1>
-    <p class="lede">CONDUCTOR turns the FM-1 into a small symphony orchestra: strings, woodwinds,
-    brass and percussion. Write parts, shape emphasis, chain the patterns into a piece and hear it all in a concert hall.</p>
+    <p class="lede">CCONDUCTOR transforms the FM-1 into a miniature symphony orchestra, with strings, woodwinds, brass and percussion. Compose in piano roll or musical notation, shape each instrument's expression, and arrange your patterns into complete pieces.</p>
     <a class="btn primary" href="https://github.com/MammothCheese/conductor/releases/latest">Download</a>
     <a class="btn ghost" href="https://github.com/MammothCheese/conductor#install">How to install</a>
     <a class="btn ghost" href="https://github.com/MammothCheese/conductor">Source</a>
@@ -100,6 +100,19 @@ footer a { color: var(--ink2); }
   </div>
 </div>
 
+<section id="inshort">
+  <h2>In short</h2>
+  <p class="sub">Unlike a conventional groovebox, CONDUCTOR is built around the language of orchestral music. Write notes on a staff, add articulations such as staccato, legato and pizzicato, shape crescendos with expression curves, and move between solo, tutti and tacet. Each pattern remembers how its musicians perform, not just what notes they play.</p>
+  <ul>
+    <li><kbd>SELECT</kbd> a section and use the knobs to control expression, balance, live transposition and tempo.</li>
+    <li><kbd>EDIT</kbd> notes on the piano roll or music staff, or press <kbd>REC</kbd> + <kbd>PLAY</kbd> to record live.</li>
+    <li><kbd>PRESETS</kbd> gives each part ten patterns (A&ndash;J), each with its own players, vibrato, balance and expression curve.</li>
+    <li><kbd>ARP</kbd> controls solos and silence; <kbd>ALGORITHM</kbd> adds articulations and expression curves shape dynamics.</li>
+    <li><kbd>SEQ</kbd> chains patterns into a complete composition.</li>
+    <li><kbd>GLO</kbd> sets the orchestral mix, hall, time signature, swing, tempo and key.</li>
+  </ul>
+  </div>
+  
 <section id="orchestra">
   <h2>The orchestra</h2>
   <p class="sub">The orchestra is arranged as seen from the conductor’s podium: strings at the front, woodwinds
@@ -113,7 +126,7 @@ footer a { color: var(--ink2); }
         <tr><td>Brass</td><td>trumpets</td><td>horns</td></tr>
         <tr><td>Percussion</td><td colspan="2">eight drums of your choice</td></tr>
       </table>
-      <p>Every melodic part can play up to <b>three notes at a time</b>. Switch a part to <span class="it">solo</span> to hear one player. The synthesized strings, wind and brass sounds
+      <p>Every melodic part is polyphonic and can play up to <b>three notes at a time</b>. The synthesized strings, wind and brass sounds
       were measured from recordings of real instruments.</p>
         <p>The seats show what is happening: a chosen section is red, a <span class="it">tacet</span> (silent) one fades, a solo part fades to its middle chair.
   The boxed letter beside each part is the pattern it is playing (<b>A</b> to <b>J</b>); the header shows the chosen
@@ -121,13 +134,13 @@ footer a { color: var(--ink2); }
       <h3>On this page</h3>
       <div class="grid">
         <div class="card"><h4>SELECT</h4><p>Choose a section, from the back of the orchestra to the front.</p></div>
-        <div class="card"><h4>KNOB 1</h4><p>How strongly that section plays from <span class="dyn">pp</span> to <span class="dyn">ff</span>.</p></div>
+        <div class="card"><h4>KNOB 1</h4><p>How strongly that section plays from <span class="dyn">pp</span> (very quiet) to <span class="dyn">ff</span> (very loud).</p></div>
         <div class="card"><h4>KNOB 2</h4><p>The section’s balance in the mix, in dB.</p></div>
         <div class="card"><h4>KNOB 3</h4><p>Transpose the whole orchestra live, a semitone at a time (not saved).</p></div>
         <div class="card"><h4>KNOB 4</h4><p>The tempo.</p></div>
         <div class="card"><h4>ARP</h4><p>Toggles between <span class="it">tutti</span> (the whole section), <span class="it">solo</span> (one player) and <span class="it">tacet</span> (silent). Hold it for a sectional: that part alone.</p></div>
         <div class="card"><h4>EDIT</h4><p>Open the chosen section's pattern.</p></div>
-        <div class="card"><h4>SEQ</h4><p>The Composer, to chain patterns into a piece. Its light stays on while the Composer is on. Hold it while playing for <span class="it">Fine</span> &ndash; <span class="it">fermata</span>: the piece finishes at the end of that pattern, and the last chord is held.</p></div>
+        <div class="card"><h4>SEQ</h4><p>The Composer, to chain patterns into a piece. Its light stays on while the Composer is on. Hold it while playing for <span class="it">Fine</span> &ndash; <span class="it">fermata</span>: the piece finishes at the end of that sequence, and the last chord is held.</p></div>
         <div class="card"><h4>GLO</h4><p>The MIX page, then the piece page, then the KEY page, then back.</p></div>
       </div>
     </div>
@@ -247,8 +260,7 @@ footer a { color: var(--ink2); }
       <h3>Curves: <span class="it">crescendo</span> and <span class="it">diminuendo</span></h3>
       <p>Each pattern can carry an <b>expression curve</b> (the music page shows it as hairpins under the staff) that swells or fades through it: press <kbd>EDIT</kbd> three times
       from a part's page (once from the music page). Turn <kbd>SELECT</kbd> for a ready-made shape (<span class="it">crescendo</span>,
-      <span class="it">diminuendo</span>, swell), then move its points with the knobs. Or <b>perform</b> it: with <kbd>REC</kbd> on and the music
-      playing, turn <kbd>KNOB 1</kbd> on the orchestra page, and one pass of the pattern is recorded as its curve.</p>
+      <span class="it">diminuendo</span>, swell), then move its points with the knobs..</p>
     </div>
     <div class="shot"><img src="guide/curve.png" alt="An expression curve"><p>The horns' curve in the start-up piece: quieter in bar 1, coming in from bar 2.</p></div>
   </div>
@@ -340,8 +352,8 @@ footer a { color: var(--ink2); }
   <table class="t">
     <tr><td><kbd>SELECT</kbd></td><td>The section.</td></tr>
     <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></td><td>Its expression / its balance / transpose the whole orchestra live / the tempo.</td></tr>
-    <tr><td><kbd>ARP</kbd></td><td>Tap: <span class="it">tutti</span>, <span class="it">solo</span>, <span class="it">tacet</span>. Hold: a sectional, that part alone.</td></tr>
-    <tr><td><kbd>SEQ</kbd></td><td>Tap: the Composer. Hold while playing: <span class="it">Fine</span> &ndash; <span class="it">fermata</span>, the piece ends at its end with the last chord held.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td>Tap: tutti (whole section), solo (one player), tacet (no players). Hold: a sectional, that part alone.</td></tr>
+    <tr><td><kbd>SEQ</kbd></td><td>Tap: the Composer. Hold while playing: Fine &ndash; fermata, the piece ends at its end with the last chord held.</td></tr>
     <tr><td><kbd>GLO</kbd></td><td>MIX, then the piece page, then the KEY page, then back.</td></tr>
     <tr><td><kbd>EDIT</kbd></td><td>The chosen section's pattern.</td></tr>
   </table>
@@ -352,7 +364,7 @@ footer a { color: var(--ink2); }
     <tr><td>Hold <kbd>ARP</kbd> + <kbd>SELECT</kbd></td><td>Jump a beat at a time.</td></tr>
     <tr><td>Hold <kbd>ARP</kbd> + <kbd>KNOB 4</kbd></td><td>Nudge the note a step earlier or later.</td></tr>
     <tr><td>Hold <kbd>ARP</kbd> + <kbd>REC</kbd></td><td>Undo your last edits (again: redo).</td></tr>
-    <tr><td><kbd>ALGORITHM</kbd></td><td>Articulation: regular, <span class="it">staccato</span>, accent, <span class="it">legato</span>, <span class="it">marcato</span>, trill (and <span class="it">pizzicato</span> and <span class="it">tremolo</span> for the strings).</td></tr>
+    <tr><td><kbd>ALGORITHM</kbd></td><td>Articulation: regular, staccato, accent, legato, marcato, trill (and pizzicato and tremolo for the strings).</td></tr>
     <tr><td><kbd>KNOB 1</kbd></td><td>The pattern's length in bars.</td></tr>
     <tr><td><kbd>KNOB 2</kbd></td><td>The note's length (or the next note's, on a rest).</td></tr>
     <tr><td><kbd>KNOB 3</kbd></td><td>The dynamic.</td></tr>
@@ -366,9 +378,9 @@ footer a { color: var(--ink2); }
   <h3>A part's page</h3>
   <table class="t">
     <tr><td><kbd>KNOB 1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td>The chosen pattern's expression / vibrato / balance.</td></tr>
-    <tr><td><kbd>KNOB 4</kbd></td><td><span class="it">Con sordino</span> on (right) or off (left): strings and brass only.</td></tr>
+    <tr><td><kbd>KNOB 4</kbd></td><td>Con sordino (a physical mute to quieten and dampen sound) on (right) or off (left): strings and brass only.</td></tr>
     <tr><td><kbd>PRESETS</kbd></td><td>The pattern, A to J.</td></tr>
-    <tr><td><kbd>ARP</kbd></td><td><span class="it">Tutti</span>, <span class="it">solo</span>, <span class="it">tacet</span>.</td></tr>
+    <tr><td><kbd>ARP</kbd></td><td>Tutti (whole section), solo (one player), tacet (silence).</td></tr>
     <tr><td><kbd>EDIT</kbd></td><td>The piano roll.</td></tr>
   </table>
 
@@ -388,7 +400,7 @@ footer a { color: var(--ink2); }
     <tr><td><kbd>KNOB 1</kbd></td><td>Choose a point.</td></tr>
     <tr><td><kbd>KNOB 2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></td><td>Its place / its level / the shape of the line after it.</td></tr>
     <tr><td><kbd>ARP</kbd> / <kbd>SEQ</kbd></td><td>Add a point / delete one.</td></tr>
-    <tr><td><kbd>SELECT</kbd></td><td>A ready-made shape: flat, <span class="it">crescendo</span>, <span class="it">diminuendo</span>, swell.</td></tr>
+    <tr><td><kbd>SELECT</kbd></td><td>A ready-made shape: flat, crescendo (gradually gets louder), diminuendo (gradually gets quieter), swell.</td></tr>
     <tr><td><kbd>GLO</kbd></td><td>The curve on or off.</td></tr>
   </table>
 
@@ -426,7 +438,7 @@ footer a { color: var(--ink2); }
     <tr><td><kbd>SEQ</kbd> or <kbd>HOME</kbd></td><td>Back to the orchestra.</td></tr>
   </table>
 
-  <h3>Every page</h3>
+  <h3>Gallery</h3>
   <div class="gallery">
     <figure><img src="guide/home.png" alt=""><figcaption>The orchestra</figcaption></figure>
     <figure><img src="guide/setup.png" alt=""><figcaption>A part's page</figcaption></figure>
@@ -439,8 +451,6 @@ footer a { color: var(--ink2); }
     <figure><img src="guide/song.png" alt=""><figcaption>The piece page</figcaption></figure>
     <figure><img src="guide/key.png" alt=""><figcaption>The key</figcaption></figure>
     <figure><img src="guide/composer.png" alt=""><figcaption>The Composer</figcaption></figure>
-    <figure><img src="guide/save.png" alt=""><figcaption>Save</figcaption></figure>
-    <figure><img src="guide/clear.png" alt=""><figcaption>Clear all?</figcaption></figure>
   </div>
 </section>
 
