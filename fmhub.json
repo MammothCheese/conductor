@@ -1,0 +1,12 @@
+{
+  "what": "A pocket symphony orchestra groovebox with strings, woodwinds, brass and percussion. Compose in piano roll or musical notation, conduct individual sections with articulations, dynamics and expression curves, and arrange patterns into complete pieces.",
+  "author": "MammothCheese",
+  "kinds": [
+    "groove"
+  ],
+  "image": "docs/card.png",
+  "color": "#BA9234",
+  "sounds": "none",
+  "play": "https://joakimeriksson.github.io/fm1-emu/?fw=conductor",
+  "cheat": "https://mammothcheese.github.io/conductor/"
+}
