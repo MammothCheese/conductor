@@ -14,7 +14,8 @@ how they play, chain the patterns into a piece and hear it all in a concert hall
   <img src="docs/guide/composer.png" width="200" alt="The Composer">
 </p>
 
-Press **PLAY** as soon as it starts: a short overture is loaded to show what it can do. It is also in **SAVE 1**, so
+When it starts, choose **FULL MODE** or **JAM MODE** with **SELECT** and press **PLAY**: a short overture is loaded to
+show what it can do. It is also in **SAVE 1**, so
 you can load it again later (until you save something of your own there).
 
 ## The orchestra
@@ -61,10 +62,30 @@ Every melodic part plays up to three notes at a time, *tutti* (the whole section
 | **GLO** | MIX, then the piece page, then the KEY page |
 | **REC** | record as you play (hold, then again: clear everything) |
 | **SAVE** | the four save slots |
-| **HOME** | back to the orchestra |
+| **HOME** | back to the orchestra (hold: switch to JAM MODE and back) |
 
 The bottom line of each page says what its knobs and buttons do. The [guide](https://mammothcheese.github.io/conductor/)
 has the full list.
+
+## Two modes
+
+- **FULL MODE**: in-depth composition with control over every element of the performance (everything above).
+- **JAM MODE**: an orchestral groovebox for quick beats and big sounds. The seven sections are tracks on one page
+  (PERC, H BRS, L BRS, H WND, L WND, H STR, L STR), each showing its whole pattern and how far it has played. The same
+  patterns, Composer and sounds as FULL MODE: a pattern made in one is there in the other.
+
+Choose at power-on; **hold HOME** to switch at any time.
+
+| In JAM MODE | Does |
+| --- | --- |
+| **SELECT** | the track |
+| **ALGORITHM** | a bar of it, or the whole pattern |
+| **SEL** (SCL) | articulations for that bar or the pattern (SEL again: apply) |
+| **FX** | effects for that bar or the pattern: swell, octave, dynamic, *con sordino*, vibrato (FX again: apply) |
+| **KNOB 1-4** | expression, balance, live transpose, tempo |
+| **ARP** | *tutti*, *solo*, *tacet* (hold: hear the track alone) |
+| **EDIT** | the track's piano roll or score |
+| **PRESETS** / **SEQ** | the track's pattern / the Composer |
 
 ## Install
 

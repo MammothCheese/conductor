@@ -80,6 +80,7 @@ footer a { color: var(--ink2); }
     <li><a href="#writing">Writing music</a></li>
     <li><a href="#expression">Expression</a></li>
     <li><a href="#song">Pieces</a></li>
+    <li><a href="#jam">JAM mode</a></li>
     <li><a href="#reference">All controls</a></li>
     <li><a href="https://github.com/MammothCheese/conductor">GitHub</a></li>
   </ul>
@@ -95,7 +96,7 @@ footer a { color: var(--ink2); }
     <a class="btn primary" href="https://github.com/MammothCheese/conductor/releases/latest">Download</a>
     <a class="btn ghost" href="https://github.com/MammothCheese/conductor#install">How to install</a>
     <a class="btn ghost" href="https://github.com/MammothCheese/conductor">Source</a>
-    <p class="note">Press <kbd>PLAY</kbd> as soon as it starts: a short overture is loaded for you to showcase the possibilities of the firmware. It is also in <b>SAVE 1</b>, so you can load it again later (until you
+    <p class="note">When it starts, choose <b>FULL MODE</b> or <b>JAM MODE</b> with <kbd>SELECT</kbd> and press <kbd>PLAY</kbd>: a short overture is loaded for you to showcase the possibilities of the firmware. It is also in <b>SAVE 1</b>, so you can load it again later (until you
     save something of your own there).</p>
   </div>
 </div>
@@ -333,6 +334,62 @@ footer a { color: var(--ink2); }
   </div>
 </section>
 
+<section id="jam">
+  <h2>JAM mode</h2>
+  <p class="sub">An orchestral groovebox for quick beats and big sounds: the same orchestra, patterns and Composer as
+  FULL MODE, laid out as seven tracks on one page.</p>
+  <div class="split">
+    <div>
+      <h3>Choosing a mode</h3>
+      <p>When CONDUCTOR starts, after the title, it asks: <b>FULL MODE</b> (in-depth composition with control over every
+      element of the performance) or <b>JAM MODE</b>. Turn <kbd>SELECT</kbd> to choose and press <kbd>PLAY</kbd> to start
+      playing in it (any other button: start without playing). <b>Hold</b> <kbd>HOME</kbd> at any time to switch to the
+      other mode. Both work on the same music, so a pattern made in one is there in the other.</p>
+    </div>
+    <div class="shot"><img src="guide/modes.png" alt="Choosing FULL MODE or JAM MODE"><p>The choice at power-on.</p></div>
+  </div>
+  <div class="split rev" style="margin-top:28px">
+    <div class="shot"><img src="guide/jam.png" alt="JAM mode: seven tracks"><p>The seven tracks, the high strings chosen.</p></div>
+    <div>
+      <h3>The tracks</h3>
+      <p>Every section is a track: PERC, H BRS, L BRS, H WND, L WND, H STR and L STR, in the order they sit. Each shows
+      its pattern letter and its <b>whole pattern</b>, a segment a bar, so you see how long it is; its notes as a small
+      outline; the part already played tinted gold, and a line where it is now. Shorter patterns show their repeats
+      faintly, so the tracks line up in time. A <span class="it">solo</span> track is underlined in gold, a
+      <span class="it">tacet</span> one fades.</p>
+      <div class="grid">
+        <div class="card"><h4>SELECT</h4><p>Choose a track.</p></div>
+        <div class="card"><h4>ALGORITHM</h4><p>Choose a bar of it, or the whole pattern.</p></div>
+        <div class="card"><h4>SEL (SCL)</h4><p>Articulations for that bar or the pattern.</p></div>
+        <div class="card"><h4>FX</h4><p>Effects for that bar or the pattern.</p></div>
+        <div class="card"><h4>KNOB 1&ndash;4</h4><p>Expression, balance, live transpose and tempo, as on the orchestra page.</p></div>
+        <div class="card"><h4>ARP</h4><p><span class="it">Tutti</span>, <span class="it">solo</span>, <span class="it">tacet</span>. Hold it to hear the track alone.</p></div>
+        <div class="card"><h4>EDIT</h4><p>The track's piano roll or score (the drums: the drum machine).</p></div>
+        <div class="card"><h4>PRESETS / SEQ</h4><p>The track's pattern, A to J / the Composer.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="split" style="margin-top:28px">
+    <div>
+      <h3>Articulations and effects</h3>
+      <p>Press <kbd>SEL</kbd> (marked SCL) for the articulations: turn <kbd>SELECT</kbd> to one and press <kbd>SEL</kbd>
+      again to apply it to every note in the chosen bar, or the whole pattern
+      (<span class="it">pizzicato</span> and <span class="it">tremolo</span> are for the strings).</p>
+      <p>Press <kbd>FX</kbd> for the effects: <kbd>SELECT</kbd> chooses one, <kbd>KNOB 1</kbd> its value, and
+      <kbd>FX</kbd> again applies it.</p>
+      <table class="t">
+        <tr><td>Swell</td><td>A <span class="it">crescendo</span>, <span class="it">diminuendo</span> or swell across the bar or pattern (its expression curve; on a bar, the rest stays even). Flat removes it.</td></tr>
+        <tr><td>Octave</td><td>The notes there down or up an octave.</td></tr>
+        <tr><td>Dynamic</td><td>Every note (or drum hit) there <span class="dyn">p</span>, <span class="dyn">mp</span>, <span class="dyn">mf</span> or <span class="dyn">f</span>.</td></tr>
+        <tr><td>Sordino</td><td><span class="it">Con sordino</span> for the whole pattern (strings and brass).</td></tr>
+        <tr><td>Vibrato</td><td>The pattern's vibrato: off, light, normal, wide.</td></tr>
+      </table>
+      <p>Changed something you did not mean to? Open the pattern (<kbd>EDIT</kbd>) and hold <kbd>ARP</kbd> + <kbd>REC</kbd> to undo.</p>
+    </div>
+    <div class="shot"><img src="guide/jam_scl.png" alt="JAM mode: articulations for a bar"><p>Staccato for bar 3 of the high strings.</p></div>
+  </div>
+</section>
+
 <section id="reference">
   <h2>All controls</h2>
 
@@ -342,7 +399,7 @@ footer a { color: var(--ink2); }
     <tr><td><kbd>REC</kbd></td><td>Tap: recording on or off. Hold, then press again: clear everything.</td></tr>
     <tr><td><kbd>FX</kbd> <kbd>SEL</kbd> <kbd>ENV</kbd></td><td>A part's page: strings, woodwinds, brass (again: the other part).</td></tr>
     <tr><td><kbd>LFO</kbd></td><td>The percussion's drum machine.</td></tr>
-    <tr><td><kbd>HOME</kbd></td><td>The orchestra page.</td></tr>
+    <tr><td><kbd>HOME</kbd></td><td>The orchestra page (in JAM mode: the tracks). Hold: switch between FULL and JAM mode.</td></tr>
     <tr><td><kbd>SAVE</kbd></td><td>The save page.</td></tr>
     <tr><td><kbd>PRESETS</kbd></td><td>The chosen part's pattern, A to J. Hold <kbd>ARP</kbd> and turn: copy it into the new letter.</td></tr>
     <tr><td><kbd>OCT-</kbd> <kbd>OCT+</kbd></td><td>Tap: the keyboard's octave. Hold on an editing page: the pattern down or up an octave.</td></tr>
@@ -451,6 +508,8 @@ footer a { color: var(--ink2); }
     <figure><img src="guide/song.png" alt=""><figcaption>The piece page</figcaption></figure>
     <figure><img src="guide/key.png" alt=""><figcaption>The key</figcaption></figure>
     <figure><img src="guide/composer.png" alt=""><figcaption>The Composer</figcaption></figure>
+    <figure><img src="guide/jam.png" alt=""><figcaption>JAM mode</figcaption></figure>
+    <figure><img src="guide/jam_fx.png" alt=""><figcaption>JAM mode: effects</figcaption></figure>
   </div>
 </section>
 

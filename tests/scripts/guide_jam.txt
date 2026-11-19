@@ -1,0 +1,14 @@
+# The user guide's JAM MODE screenshots (docs/guide/jam*.png): sh tests/run_host.sh tests/scripts/guide_jam.txt, then
+# 5800 jam, 6300 jam_scl, 6800 jam_fx (build/host/conductor-<ms>.png). The chooser (docs/guide/modes.png) is drawn
+# only on the FM-1 and with -DHOST_CHOOSER (the host's scripts start in FULL MODE)
+3000 btn 12
+3200 btndown 8
+4200 btnup 8
+5800 shot
+5900 enc 1 3
+6000 btn 3
+6300 shot
+6400 btn 8
+6500 btn 2
+6800 shot
+6900 end

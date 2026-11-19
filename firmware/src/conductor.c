@@ -3222,7 +3222,7 @@ static void app_idle(void)
 }
 
 /* ======================================================================== the main loop */
-enum { SCR_HOME, SCR_SETUP, SCR_EDIT, SCR_MIX, SCR_SAVE, SCR_COMP, SCR_CURVE, SCR_COPY, SCR_SONG, SCR_KEY };
+enum { SCR_HOME, SCR_SETUP, SCR_EDIT, SCR_MIX, SCR_SAVE, SCR_COMP, SCR_CURVE, SCR_COPY, SCR_SONG, SCR_KEY, SCR_JAM, SCR_JART, SCR_JFX };
 static uint32_t flash_until[NINS];
 static uint32_t lit_mask(void)                  /* the players sounding now */
 {
@@ -3323,6 +3323,198 @@ static void title_strip(int32_t y0)             /* the title page, like a printe
     ctext_c(120, 184 - y0, &SERIF_S, TITLE_VER, C_INK2);
     cv_blit(0, (uint32_t)y0);
 }
+
+/* ---- JAM MODE: the same score as a groovebox - the seven tracks on one page, each drawn whole (every bar of its
+ * pattern, its notes as a small contour, how far it has played); ALGORITHM chooses a bar (or the whole pattern), SEL
+ * (SCL) its articulation, FX its effects. Chosen at power-on (FULL or JAM), switched by holding HOME */
+static const char *const JNAME[NROW] = {"PERC", "H BRS", "L BRS", "H WND", "L WND", "H STR", "L STR"};   /* (as ORDER7) */
+static const char *const JART_NAME[NART] = {"norm.", "stacc.", "accent", "legato", "marc.", "pizz.", "trem.", "trill"};
+static const char *const JFX_NAME[5] = {"SWELL", "OCTAVE", "DYNAMIC", "SORDINO (ALL)", "VIBRATO (ALL)"};
+static const uint8_t JFX_N[5] = {4, 3, 4, 2, 4};   /* each effect's values */
+#define C_ROSE RGB(236, 200, 200)
+#define C_TINT RGB(246, 228, 180)
+#define JLX 72                                  /* the lanes: from x 72, 64 steps across 160 px */
+#define JLW 160
+static uint32_t jam_bars(uint32_t sel) { return (LEN(sel) + BAR - 1u) / BAR; }
+static void jam_range(uint32_t sel, uint32_t jbar, uint32_t *a, uint32_t *b)   /* the steps a bar (0: the pattern) covers */
+{
+    uint32_t len = LEN(sel);
+    if (!jbar) { *a = 0; *b = len; }
+    else { *a = (jbar - 1u) * BAR; *b = jbar * BAR < len ? jbar * BAR : len; }
+}
+static uint32_t jam_row(uint32_t sel) { uint32_t r = 0; while (r < 6u && ORDER7[r] != PK(sel)) r++; return r; }
+static int jam_art_ok(uint32_t sel, uint32_t a) { return MELODIC(sel) && !(ART_STR(a) && INS[sel].ty != TY_STR); }
+static int jam_fx_ok(uint32_t sel, uint32_t row)   /* the drums: swell and dynamic; the winds: no mute */
+{
+    if (!MELODIC(sel)) return row == 0u || row == 2u;
+    return row != 3u || (INS[sel].ty != TY_OBOE && INS[sel].ty != TY_BSN);
+}
+static void jam_lane(uint32_t row, int32_t y, uint32_t sel, uint32_t jbar, uint32_t run)
+{
+    uint32_t i = ORDER7[row], q = sc.psel[i] % NPAT, len = plen(i, q), on = PK(sel) == i, k, rep, tacet = 1, solo = 0, pos = 0xFFFFu;
+    int32_t top = y + 4, h = 15, lo = 127, hi = 0;
+    uint16_t ink;
+    if (MELODIC(i)) { tacet = sc.pmute[i][q]; solo = sc.psolo[i][q]; }
+    else for (k = P_BD; k < NINS; k++) tacet &= sc.mute[k];
+    if (run && play_pat[i] % NPAT == q) pos = cur[i] % len;
+    ink = tacet ? C_RULE : on ? C_WINE : C_INK;
+    if (on) cv_rect(5, y, 231, 23, C_ROSE);
+    ctext(9, y + 4, &SERIF_S, JNAME[row], ink);
+    if (solo) cv_rect(9, y + 18, text_w(&SERIF_S, JNAME[row]), 2, C_GOLD);   /* (solo: underlined in gold) */
+    lbox(54, y + 4, (char)('A' + q), &SERIF_S, ink, ink, C_PAPER);
+    if (MELODIC(i))
+        for (k = 0; k < len; k++) { const mstep_t *m = &sc.mel[i][q][k]; uint32_t j; for (j = 0; j < NV; j++) if (m->n[j]) { if (m->n[j] < lo) lo = m->n[j]; if (m->n[j] > hi) hi = m->n[j]; } }
+    if (hi <= lo) hi = lo + 1;
+    for (rep = 0; rep * len < NSTEP; rep++) {   /* the pattern, then its repeats paler, to 64 steps */
+        int32_t x0 = JLX + (int32_t)(rep * len * JLW / NSTEP), w = (int32_t)(len * JLW / NSTEP);
+        uint32_t b, bars = (len + BAR - 1u) / BAR;
+        if (x0 >= JLX + JLW) break;
+        if (x0 + w > JLX + JLW) w = JLX + JLW - x0;
+        if (rep) { cv_frame(x0, top, w - 1, h, C_FAINT); continue; }
+        cv_rect(x0, top, w - 1, h, C_CARD);
+        if (pos != 0xFFFFu && pos) cv_rect(x0, top, (int32_t)(pos * JLW / NSTEP), h, C_TINT);   /* (how far it has played) */
+        for (b = 1; b < bars; b++) cv_rect(x0 + (int32_t)(b * BAR * JLW / NSTEP), top, 1, h, C_RULE);
+        cv_frame(x0, top, w - 1, h, tacet ? C_FAINT : C_INK2);
+        for (k = 0; k < len; k++) {
+            int32_t xk = x0 + (int32_t)(k * JLW / NSTEP) + 1;
+            if (MELODIC(i)) {
+                const mstep_t *m = &sc.mel[i][q][k];
+                uint32_t j, L = m->len ? m->len : 1u;
+                int32_t wl = (int32_t)(L * JLW / NSTEP) - 1;
+                if (k + L > len) wl = (int32_t)((len - k) * JLW / NSTEP) - 2;
+                for (j = 0; j < NV; j++) if (m->n[j])
+                    cv_rect(xk, top + h - 4 - (int32_t)(m->n[j] - (uint32_t)lo) * (h - 6) / (hi - lo), wl > 1 ? wl : 1, 2, tacet ? C_RULE : WINES[m->dyn & 3u]);
+            } else {
+                uint32_t d, n = 0;
+                for (d = 0; d < NDRUM; d++) if (sc.drum[d][q][k] && !sc.mute[P_BD + d]) n++;
+                if (n) cv_rect(xk, top + h - 2 - (int32_t)n * 2, 2, (int32_t)n * 2, tacet ? C_RULE : WINES[2]);
+            }
+        }
+        if (on && jbar) {                       /* the bar chosen: framed in wine */
+            int32_t bx = x0 + (int32_t)((jbar - 1u) * BAR * JLW / NSTEP), bw = (int32_t)(BAR * JLW / NSTEP);
+            cv_frame(bx, top - 2, bw, h + 4, C_WINE); cv_frame(bx - 1, top - 3, bw + 2, h + 6, C_WINE);
+        }
+        if (pos != 0xFFFFu) cv_rect(x0 + (int32_t)(pos * JLW / NSTEP), top - 1, 1, h + 2, C_INK);   /* (where it is) */
+    }
+}
+static void jam_card(uint32_t kind, uint32_t sel, uint32_t jbar, uint32_t pick, const uint8_t *fxv)   /* kind 1 SCL, 2 FX */
+{
+    static const char *const FXV[5][4] = {{"flat", "cresc.", "dim.", "swell"}, {"down", "none", "up", ""},
+                                          {"p", "mp", "mf", "f"}, {"off", "on", "", ""}, {"off", "light", "normal", "wide"}};
+    int32_t y = jam_row(sel) >= 3u ? 2 : 76, k;
+    char t[40], *p;
+    cv_rect(5, y, 230, 104, C_CARD); cv_frame(5, y, 230, 104, C_INK2); cv_frame(8, y + 3, 224, 98, C_GOLD);
+    p = cat(t, JNAME[jam_row(sel)]);
+    if (jbar) { p = cat(p, "  BAR "); p = catu(p, jbar, 0); } else p = cat(p, "  ALL BARS");
+    cat(p, kind == 1u ? ": ARTICULATION" : ": EFFECTS");
+    ctext_c(120, y + 6, &SERIF_S, t, C_INK2);
+    if (kind == 1u) {
+        if (!MELODIC(sel)) { ctext_c(120, y + 46, &SERIF_S, "the drums have no articulations", C_RULE); return; }
+        for (k = 0; k < (int32_t)NART; k++) {
+            int32_t x = 14 + (k % 4) * 54, yy = y + 26 + (k / 4) * 32, on = k == (int32_t)pick, ok = jam_art_ok(sel, (uint32_t)k);
+            cv_rect(x, yy, 50, 26, on ? C_WINE : C_PAPER); cv_frame(x, yy, 50, 26, on ? C_WINE : ok ? C_RULE : C_FAINT);
+            ctext_c(x + 25, yy + 6, &SERIF_S, JART_NAME[k], on ? C_CARD : ok ? C_INK : C_FAINT);
+        }
+    } else
+        for (k = 0; k < 5; k++) {
+            int32_t yy = y + 24 + k * 15, on = k == (int32_t)pick, ok = jam_fx_ok(sel, (uint32_t)k);
+            if (on) cv_rect(10, yy - 1, 220, 15, C_WINE);
+            ctext(16, yy, &SERIF_S, JFX_NAME[k], on ? C_CARD : ok ? C_INK : C_FAINT);
+            ctext_r(226, yy, &SERIF_S, ok ? FXV[k][fxv[k] % JFX_N[k]] : "-", on ? C_CARD : ok ? C_WINE : C_FAINT);
+        }
+}
+static void draw_jam(uint32_t kind, uint32_t sel, uint32_t jbar, uint32_t run, uint32_t pick, const uint8_t *fxv)
+{
+    uint32_t r;
+    cv_begin(240, BODY_H, C_PAPER);
+    sides(BODY_H);
+    for (r = 0; r < NROW; r++) jam_lane(r, 4 + (int32_t)r * 25, sel, jbar, run);
+    if (kind) jam_card(kind, sel, jbar, pick, fxv);
+    cv_blit(0, BODY_Y);
+}
+static void draw_foot_jam(uint32_t kind, uint32_t jbar)
+{
+    char t[40], *p;
+    foot_begin();
+    if (kind == 1u) cat(t, "SELECT choose  ALG bar  SCL apply");
+    else if (kind == 2u) cat(t, "SELECT effect  K1 value  FX apply");
+    else if (jbar) { p = cat(t, "BAR "); p = catu(p, jbar, 0); cat(p, "  SCL artic.  FX effects"); }
+    else cat(t, "ALG bar  SCL artic.  FX effects");
+    ctext_c(120, 8, &SERIF_S, t, C_INK2);
+    cv_blit(0, FOOT_Y);
+}
+static char jam_msg[32];
+static const char *jam_art(uint32_t sel, uint32_t jbar, uint32_t art)   /* the articulation over the bar (or the pattern);
+                                                   "!..." if it could not be */
+{
+    static const char *const AS[NART] = {"REGULAR", "STACCATO", "ACCENT", "LEGATO", "MARCATO", "PIZZICATO", "TREMOLO", "TRILL"};
+    uint32_t a, b, k;
+    char *p;
+    if (!MELODIC(sel)) return "!NO ARTICULATIONS FOR DRUMS";
+    if (!jam_art_ok(sel, art)) return "!FOR THE STRINGS ONLY";
+    jam_range(sel, jbar, &a, &b);
+    for (k = a; k < b; k++) { mstep_t *m = &MS(sel, k); if (has_notes(m)) m->dyn = (uint8_t)((m->dyn & 3u) | art << 2); }
+    p = cat(cat(jam_msg, AS[art]), jbar ? ": BAR " : ": ALL BARS");
+    if (jbar) catu(p, jbar, 0);
+    return jam_msg;
+}
+static const char *jam_fx(uint32_t sel, uint32_t jbar, uint32_t row, uint32_t v)   /* an effect over the bar (or pattern) */
+{
+    uint32_t a, b, k, d;
+    char *p;
+    if (!jam_fx_ok(sel, row)) return "!NOT FOR THIS TRACK";
+    jam_range(sel, jbar, &a, &b);
+    if (row == 0u) {                            /* SWELL: the curve - over the pattern, or the bar (the rest even) */
+        curve_t *c = &sc.curve[PK(sel)][PSEL(sel)];
+        uint32_t n = 0, len = LEN(sel);
+#define JPT(ps, vl) (c->p[n].pos = (uint8_t)(ps), c->p[n].val = (uint8_t)(vl), c->p[n].shape = CS_SMOOTH, n++)
+        if (!jbar || v == 0u) curve_preset(c, v, len);
+        else {
+            if (a) { JPT(0, 127); JPT(a, 127); }
+            if (v == 1u) { JPT(a, 48); JPT(b, 127); }
+            else if (v == 2u) { if (!a) JPT(0, 127); JPT(b, 48); if (b < len) JPT(b, 127); }
+            else { JPT(a, 48); JPT((a + b) / 2u, 127); JPT(b, 48); if (b < len) JPT(b, 127); }
+            c->n = (uint8_t)n; c->on = 1;
+        }
+#undef JPT
+        if (v == 0u) { c->n = 0; c->on = 0; }
+    } else if (row == 1u) {                     /* OCTAVE: the notes there down / up (all must stay in range) */
+        int32_t s = v == 0u ? -12 : v == 2u ? 12 : 0;
+        if (!s) return "!OCTAVE: NONE CHOSEN";
+        for (k = a; k < b; k++) for (d = 0; d < NV; d++) { uint32_t n = MS(sel, k).n[d]; if (n && ((int32_t)n + s < 24 || (int32_t)n + s > 108)) return "!OUT OF RANGE"; }
+        for (k = a; k < b; k++) for (d = 0; d < NV; d++) if (MS(sel, k).n[d]) MS(sel, k).n[d] = (uint8_t)((int32_t)MS(sel, k).n[d] + s);
+    } else if (row == 2u) {                     /* DYNAMIC: every note (or hit) there */
+        if (MELODIC(sel)) { for (k = a; k < b; k++) if (has_notes(&MS(sel, k))) MS(sel, k).dyn = (uint8_t)((MS(sel, k).dyn & ~3u) | v); }
+        else for (d = 0; d < NDRUM; d++) for (k = a; k < b; k++) if (sc.drum[d][PSEL(P_BD)][k]) sc.drum[d][PSEL(P_BD)][k] = (uint8_t)(v + 1u);
+    } else if (row == 3u) VIB(sel) = (uint8_t)((VIB(sel) & 0x7Fu) | (v ? 0x80u : 0u));   /* the pattern's mute */
+    else VIB(sel) = (uint8_t)((VIB(sel) & 0x80u) | (v & 3u));   /* the pattern's vibrato */
+    p = cat(cat(jam_msg, row == 3u ? (v ? "CON SORDINO" : "SENZA SORDINO") : row == 4u ? "VIBRATO" : JFX_NAME[row]),
+            row >= 3u || !jbar ? ": ALL BARS" : ": BAR ");
+    if (jbar && row < 3u) catu(p, jbar, 0);
+    return jam_msg;
+}
+/* the chooser at power-on, as the title page: FULL MODE or JAM MODE */
+static void mode_strip(int32_t y0, uint32_t jam)
+{
+    cv_begin(240, 120, C_PAPER);
+    cv_frame(8, 8 - y0, 224, 224, C_GOLD);
+    ctext_c(120, 14 - y0, &SERIF_L, "CONDUCTOR", C_INK);
+    ctext_c(120, 46 - y0, &ITAL_M, "a pocket orchestra", C_WINE);
+    cv_rect(70, 70 - y0, 100, 1, C_GOLD);
+    cv_rect(18, 80 - y0, 204, 70, jam ? C_CARD : C_WINE);
+    if (jam) cv_frame(18, 80 - y0, 204, 70, C_RULE);
+    ctext(28, 85 - y0, &SERIF_M, "FULL MODE", jam ? C_INK : C_CARD);
+    ctext(28, 106 - y0, &SERIF_S, "In-depth composition with", jam ? C_INK2 : C_ROSE);
+    ctext(28, 119 - y0, &SERIF_S, "control over every element", jam ? C_INK2 : C_ROSE);
+    ctext(28, 132 - y0, &SERIF_S, "of the performance.", jam ? C_INK2 : C_ROSE);
+    cv_rect(18, 156 - y0, 204, 50, jam ? C_WINE : C_CARD);
+    if (!jam) cv_frame(18, 156 - y0, 204, 50, C_RULE);
+    ctext(28, 161 - y0, &SERIF_M, "JAM MODE", jam ? C_CARD : C_INK);
+    ctext(28, 180 - y0, &SERIF_S, "Orchestral groovebox for", jam ? C_ROSE : C_INK2);
+    ctext(28, 192 - y0, &SERIF_S, "quick beats and big sounds.", jam ? C_ROSE : C_INK2);
+    ctext_c(120, 213 - y0, &SERIF_S, "SELECT choose  PLAY start", C_INK2);
+    cv_blit(0, (uint32_t)y0);
+}
 static void app_main(void)
 {
     uint32_t scr = SCR_HOME, sel = S_HI, cursor = 0, cur_dyn = 2, nlen = 4, rec = 0, prev = 0, k, music = 0;
@@ -3335,6 +3527,11 @@ static void app_main(void)
     uint32_t slot = 0, confirm = 0, confirm_t = 0, proj_go = 0, proj_go_t = 0;   /* the save page */
     uint32_t crow = 0, cbox = 0, arp_used = 0;   /* the Composer: the row and box; ARP held for a copy */
     uint32_t cp_row = 0, cp_pat = 0, cp_ask = 0, cp_back = SCR_EDIT;
+    uint32_t jam = 0, jbar = 0, jart = ART_STAC, jfx = 0, home_t0 = 0, home_down = 0;   /* JAM MODE: on; the bar chosen
+                                                   (0: the whole pattern); the articulation, the effect chosen; HOME held */
+    uint8_t jfxv[5] = {1, 2, 3, 0, 2};          /* ... each effect's value: crescendo, up, f, senza, normal */
+#define HOME_S (jam ? SCR_JAM : SCR_HOME)       /* the mode's own first page */
+#define HOMEISH (scr == SCR_HOME || scr == SCR_JAM)
 #define ARTW(i) (ART_STR(art_cur) && INS[i].ty != TY_STR ? ART_NONE : art_cur)   /* (pizzicato, tremolo: strings only) */
     int32_t key_from = 0;                       /* the KEY page: the key the music is in (REC moves it to the one shown) */
     uint32_t key_ask = 0, arp_t0 = 0, seq_t0 = 0, seq_down = 0, seq_used = 0;   /* ... asking; ARP / SEQ held (listen alone,
@@ -3378,6 +3575,24 @@ static void app_main(void)
             if (fm1_input_edges(&rl)) break;    /* (taken: the press only skips the title) */
         }
     }
+#if !defined(DINGHY_HOST) || defined(HOST_CHOOSER)   /* (the host's scripts start in FULL MODE; HOLD HOME for JAM) */
+    {                                           /* FULL MODE or JAM MODE: SELECT chooses, PLAY starts (any other button:
+                                                   without playing) */
+        uint32_t rl, bb, j;
+        mode_strip(0, jam); mode_strip(120, jam);
+        for (;;) {
+            int32_t ee;
+            platform_poll();
+            bb = fm1_input_edges(&rl);
+            ee = fm1_enc_take(ENC_SELECT) + fm1_enc_take(ENC_ALGORITHM);
+            if (ee) { jam = ee > 0; mode_strip(0, jam); mode_strip(120, jam); }
+            if (bb & (1u << BTN_PLAY)) { run_req = 1; break; }
+            if (bb) break;
+        }
+        for (j = 0; j < 7u; j++) (void)fm1_enc_take(j);   /* (turns while choosing: not kept) */
+        scr = HOME_S;
+    }
+#endif
     lcd_fill(0, 0, 240, 240, C_PAPER);
 
     for (;;) {
@@ -3424,7 +3639,7 @@ static void app_main(void)
 
         /* ---- buttons */
         if (b & (1u << BTN_PLAY)) { run_req = !run_req; head = 1; }
-        if (seq_down && scr == SCR_HOME && fm1_in.buttons >> BTN_SEQ & 1u && !seq_used && fm1_ms - seq_t0 > 600u) {   /* SEQ
+        if (seq_down && HOMEISH && fm1_in.buttons >> BTN_SEQ & 1u && !seq_used && fm1_ms - seq_t0 > 600u) {   /* SEQ
                                                    held: end at the end of the song (the Composer's, or the patterns'), the
                                                    last notes held on; held again: it goes on */
             seq_used = 1;
@@ -3432,7 +3647,7 @@ static void app_main(void)
             else SAY("PLAY, THEN HOLD SEQ TO END", 1200u);
         }
         if (rel & (1u << BTN_SEQ) && seq_down) {   /* let go: a tap was the Composer, on this part's row */
-            if (!seq_used && scr == SCR_HOME) { for (crow = 0; crow < 6u && ORDER7[crow] != PK(sel); crow++) {} GOTO(SCR_COMP); }
+            if (!seq_used && HOMEISH) { for (crow = 0; crow < 6u && ORDER7[crow] != PK(sel); crow++) {} GOTO(SCR_COMP); }
             seq_down = 0;
         }
         if (!run_req && end_req) end_req = 0;   /* (stopped: no ending waiting) */
@@ -3497,6 +3712,23 @@ static void app_main(void)
             if (!rec_done && fm1_ms - rec_t0 < 600u) { rec = !rec; head = 1; if (rec) rec_take++; SAY(rec ? "RECORDING: PLAY TO RECORD" : "RECORDING OFF", 1200u); }
             rec_down = 0;
         }
+        if (scr >= SCR_JAM && jbar > jam_bars(sel)) jbar = 0;   /* (a shorter pattern: the whole of it) */
+        if (scr >= SCR_JAM && (b & (1u << BTN_FX | 1u << BTN_SEL))) {   /* JAM: FX the effects, SEL (SCL) the articulations;
+                                                   the same again: applied, and back to the tracks */
+            uint32_t isfx = b >> BTN_FX & 1u;
+            if (scr == (isfx ? SCR_JFX : SCR_JART)) {
+                const char *r;
+                un_keep(PK(sel), PSEL(sel), 1u);    /* (undo: ARP + REC on the pattern's page) */
+                r = isfx ? jam_fx(sel, jbar, jfx, jfxv[jfx]) : jam_art(sel, jbar, jart);
+                if (r[0] != '!') { CHANGED(); SAY(r, 1500u); } else SAY(r + 1, 1500u);
+                GOTO(SCR_JAM);
+            } else {
+                if (isfx && MELODIC(sel)) { jfxv[3] = (uint8_t)(VIB(sel) >> 7 & 1u); jfxv[4] = (uint8_t)(VIB(sel) & 3u); }
+                if (!isfx && !jam_art_ok(sel, jart)) jart = ART_STAC;
+                GOTO(isfx ? SCR_JFX : SCR_JART);
+            }
+            b &= ~(1u << BTN_FX | 1u << BTN_SEL);
+        }
         for (k = 0; k < NSEC; k++) {                /* FX SEL ENV LFO: a section's setup */
             static const uint8_t SB[NSEC] = {BTN_FX, BTN_SEL, BTN_ENV, BTN_LFO};
             if (b & (1u << SB[k])) {
@@ -3507,12 +3739,18 @@ static void app_main(void)
                 if (cursor >= LEN(sel)) cursor = 0;
             }
         }
-        if (scr == SCR_HOME && !MELODIC(sel)) sel_all = 1;   /* (on the orchestra the percussion is one) */
+        if (HOMEISH && !MELODIC(sel)) sel_all = 1;   /* (on the orchestra the percussion is one) */
         if (b & (1u << BTN_HOME)) {
-            GOTO(SCR_HOME);                     /* (the Composer: SEQ) */
+            GOTO(HOME_S);                       /* (the Composer: SEQ) */
+            home_t0 = fm1_ms; home_down = 1;
+        }
+        if (home_down && !(fm1_in.buttons >> BTN_HOME & 1u)) home_down = 0;
+        if (home_down && fm1_ms - home_t0 > 800u) {   /* HOME held: the other mode */
+            home_down = 0; jam = !jam; jbar = 0;
+            GOTO(HOME_S); SAY(jam ? "JAM MODE" : "FULL MODE", 1200u);
         }
         if (b & (1u << BTN_EDIT)) {
-            if (scr == SCR_MIX) GOTO(SCR_HOME);
+            if (scr == SCR_MIX) GOTO(HOME_S);
             else if (scr == SCR_COPY) GOTO(cp_back);   /* (EDIT: back, nothing copied) */
             else if (scr == SCR_EDIT && !music) music = 1;   /* the pattern: piano roll -> music -> its curve -> roll */
             else if (scr == SCR_EDIT) { music = 0; ptsel = 0; GOTO(SCR_CURVE); }
@@ -3524,7 +3762,7 @@ static void app_main(void)
             redraw = foot = head = 1;
         }
         if (b & (1u << BTN_ARP)) { arp_used = 0; arp_t0 = fm1_ms; }
-        if (scr == SCR_HOME && fm1_in.buttons >> BTN_ARP & 1u && !arp_used && fm1_ms - arp_t0 > 500u) {   /* ARP held: only
+        if (HOMEISH && fm1_in.buttons >> BTN_ARP & 1u && !arp_used && fm1_ms - arp_t0 > 500u) {   /* ARP held: only
                                                    the chosen part heard, while it is held (no section/solo/muted then) */
             static char lb[28];
             arp_used = 1; listen_only = (uint8_t)PK(sel);
@@ -3558,14 +3796,14 @@ static void app_main(void)
                 else if (s0 >= 0) MS(sel, s0).len = (uint8_t)(cursor - (uint32_t)s0);
                 cursor = (cursor + 1u) % LEN(sel);
                 CHANGED(); redraw = foot = 1; t_nav = fm1_ms;
-            } else if ((scr == SCR_HOME || scr == SCR_SETUP) && MELODIC(sel)) {   /* section -> solo (one player) ->
+            } else if ((HOMEISH || scr == SCR_SETUP) && MELODIC(sel)) {   /* section -> solo (one player) ->
                                                    muted -> section */
                 if (MUTE(sel)) { MUTE(sel) = 0; SOLO(sel) = 0; }
                 else if (SOLO(sel)) { SOLO(sel) = 0; MUTE(sel) = 1; }
                 else SOLO(sel) = 1;
                 SAY(MUTE(sel) ? "TACET: NONE" : SOLO(sel) ? "SOLO: ONE PLAYER" : "TUTTI: WHOLE SECTION", 1200u);
                 CHANGED(); redraw = foot = 1;
-            } else if (scr == SCR_HOME && sel_all) {   /* the percussion: every drum muted, or none */
+            } else if (HOMEISH && sel_all) {   /* the percussion: every drum muted, or none */
                 uint32_t any = 0;
                 for (k = P_BD; k < NINS; k++) any |= !MUTE(k);
                 for (k = P_BD; k < NINS; k++) MUTE(k) = (uint8_t)any;
@@ -3605,12 +3843,12 @@ static void app_main(void)
                     if (cursor >= LEN(sel)) cursor = 0;
                     cp_ask = 0; CHANGED(); GOTO(cp_back); SAY("COPIED", 1200u);
                 }
-            } else if (scr == SCR_HOME) {       /* (a tap: the Composer, as it is let go; held: the ending, below) */
+            } else if (HOMEISH) {               /* (a tap: the Composer, as it is let go; held: the ending, below) */
                 seq_t0 = fm1_ms; seq_down = 1; seq_used = 0;
-            } else if (scr == SCR_COMP) GOTO(SCR_HOME);
+            } else if (scr == SCR_COMP) GOTO(HOME_S);
         }
         if (scr == SCR_COPY && cp_ask && (b & ~(1u << BTN_SEQ))) { cp_ask = 0; redraw = 1; }   /* (anything else: no) */
-        if (b & (1u << BTN_GLO) && scr == SCR_HOME) {   /* GLO: MIX (on the chosen section's row), the song page, back */
+        if (b & (1u << BTN_GLO) && HOMEISH) {   /* GLO: MIX (on the chosen section's row), the song page, back */
             for (mrow = 0; mrow < 6u && ORDER7[mrow] != PK(sel); mrow++) {}
             GOTO(SCR_MIX);
         }
@@ -3621,7 +3859,7 @@ static void app_main(void)
         }
         else if (b & (1u << BTN_GLO) && scr == SCR_SONG) { key_from = KEYSIG; key_ask = 0; GOTO(SCR_KEY); }
         else if (b & (1u << BTN_GLO) && scr == SCR_KEY) {
-            GOTO(SCR_HOME);
+            GOTO(HOME_S);
         } else if (b & (1u << BTN_GLO) && scr == SCR_CURVE) {   /* the curve on (it plays) / bypassed (flat) */
             curve_t *c = &sc.curve[PK(sel)][PSEL(sel)];
             if (!c->n) curve_preset(c, 0, LEN(sel));
@@ -3681,6 +3919,14 @@ static void app_main(void)
         /* ---- encoders. On every editing page: ALGORITHM the page (bar), KNOB4 the pattern's length */
         if ((e = fm1_enc_take(ENC_SELECT)) != 0) {
             if (scr == SCR_COPY) { cp_row = wrapi((int32_t)cp_row + e, NROW); cp_ask = 0; }   /* the copy page: the part */
+            else if (scr == SCR_JART && MELODIC(sel)) {   /* JAM, SCL: the articulation (the strings' own: theirs only) */
+                int32_t st1 = e > 0 ? 1 : -1, nn = e > 0 ? e : -e;
+                while (nn--) do jart = wrapi((int32_t)jart + st1, NART); while (!jam_art_ok(sel, jart));
+            }
+            else if (scr == SCR_JFX) {          /* JAM, FX: the effect (the ones this track has) */
+                int32_t st1 = e > 0 ? 1 : -1, nn = e > 0 ? e : -e;
+                while (nn--) do jfx = wrapi((int32_t)jfx + st1, 5u); while (!jam_fx_ok(sel, jfx));
+            }
             else if (scr == SCR_KEY) {          /* the key: a sharp or flat a click (the notation; REC moves the music) */
                 sc.rsv2[0] = (uint8_t)(int8_t)clampi(KEYSIG + e, -7, 7); key_ask = 0; CHANGED(); head = 1;
             }
@@ -3702,7 +3948,8 @@ static void app_main(void)
                 curve_preset(&sc.curve[PK(sel)][PSEL(sel)], preset, LEN(sel));
                 ptsel = 0; SAY(PRESET_NAME[preset], 1000u); CHANGED(); head = 1;
             }
-            else if (scr == SCR_HOME) {         /* through all of them, as they sit: percussion, brass, winds, strings */
+            else if (HOMEISH) {                 /* through all of them, as they sit: percussion, brass, winds, strings */
+                jbar = 0;
                 uint32_t pos = 0;
                 part[INS[sel].s] = (uint8_t)sel;
                 while (pos < 6u && ORDER7[pos] != PK(sel)) pos++;
@@ -3724,6 +3971,8 @@ static void app_main(void)
         }
         if ((e = fm1_enc_take(ENC_ALGORITHM)) != 0) {
             if (scr == SCR_COPY) { cp_pat = wrapi((int32_t)cp_pat + e, NPAT); cp_ask = 0; }   /* the copy page: the pattern */
+            else if (scr >= SCR_JAM) { jbar = wrapi((int32_t)jbar + e, jam_bars(sel) + 1u); head = 1; }   /* JAM: the bar
+                                                   (0: the whole pattern) */
             else if (scr == SCR_SAVE) { slot = wrapi((int32_t)slot + e, NPROJ); confirm = 0; }
             else if (scr == SCR_COMP) crow = wrapi((int32_t)crow + e, NROW);
             else if (scr == SCR_MIX) {
@@ -3801,13 +4050,15 @@ static void app_main(void)
                 *v = (uint8_t)clampi((int32_t)*v + e, 0, 6);
                 CHANGED(); redraw = foot = 1;
             }
-            else if (scr == SCR_HOME) {         /* the section's expression (continuous: the markings are ranges) */
+            else if (HOMEISH) {                 /* the section's expression (continuous: the markings are ranges) */
                 uint32_t r = PK(sel);
                 EXPR(r) = expr_step(EXPR(r), e);   /* (a marking a click: pp p mp mf f ff) */
                 if (rec && run && xrec_row == 0xFFu) xrec_start(r);   /* recording: the take begins */
                 else if (xrec_row == r) xbuf[xrec_last] = EXPR(r);
-                ov_kind = 1; ov_until = fm1_ms + 1500u; redraw = 1; head = 1;
+                if (scr == SCR_HOME) { ov_kind = 1; ov_until = fm1_ms + 1500u; }   /* (JAM: the header shows it) */
+                redraw = 1; head = 1;
             }
+            else if (scr == SCR_JFX) { jfxv[jfx] = (uint8_t)clampi((int32_t)jfxv[jfx] + e, 0, JFX_N[jfx] - 1); redraw = 1; }
             else if (scr == SCR_MIX) {          /* the expression, as KNOB 1 on the orchestra (the hall: how much of it) */
                 if (mrow == MIX_HALL) { sc.rsv = (uint8_t)clampi((int32_t)sc.rsv + e, 0, NHALL - 1); set_hall(); }
                 else if (mrow == MIX_CLICK) sc.click = (uint8_t)clampi((int32_t)sc.click + e, 0, NCLK - 1);
@@ -3830,7 +4081,7 @@ static void app_main(void)
                 if (cursor >= LEN(sel)) cursor = LEN(sel) - 1u;
                 redraw = foot = head = 1;
             }
-            if (scr != SCR_SAVE) CHANGED();
+            if (scr != SCR_SAVE && scr != SCR_JFX) CHANGED();
         }
         if ((e = fm1_enc_take(ENC_KNOB2)) != 0 && scr == SCR_CURVE) {   /* the point's place (between its neighbours) */
             curve_t *c = &sc.curve[PK(sel)][PSEL(sel)];
@@ -3855,10 +4106,18 @@ static void app_main(void)
         } else if (e && scr == SCR_SETUP && TIMPANI(sel)) {   /* a timpano's tuning */
             sc.tune[sel] = (uint8_t)clampi((int32_t)sc.tune[sel] + e, DTY(sel).ty == TY_TOM ? 45 : 36, DTY(sel).ty == TY_TOM ? 72 : 60);
             live(sel, 0, cur_dyn, 1); CHANGED(); foot = 1;
-        } else if (e && scr == SCR_HOME) {      /* the section's balance (the mix; the MIX page shows all seven) */
+        } else if (e && HOMEISH) {              /* the section's balance (the mix; the MIX page shows all seven) */
             uint32_t r = PK(sel);
             BALN(r) = (int8_t)clampi(BALN(r) + e, -30, 6);
-            ov_kind = 2; ov_until = fm1_ms + 1500u; redraw = 1; CHANGED();
+            if (scr == SCR_HOME) { ov_kind = 2; ov_until = fm1_ms + 1500u; }
+            else {                              /* (JAM: a message) */
+                int32_t db = BALN(r);
+                char *q = cat(msgbuf, "BALANCE ");
+                if (db > 0) *q++ = '+'; else if (db < 0) *q++ = '-';
+                cat(catu(q, (uint32_t)(db < 0 ? -db : db), 0), " dB");
+                SAY(msgbuf, 900u);
+            }
+            redraw = 1; CHANGED();
         } else if (e && scr == SCR_EDIT) {      /* LENGTH: how long the notes at the cursor last (and the next ones) */
             int32_t s0 = cover(sel, PSEL(sel), cursor);
             if (s0 >= 0) {
@@ -3872,7 +4131,7 @@ static void app_main(void)
         if ((e = fm1_enc_take(ENC_KNOB3)) != 0 && scr == SCR_SETUP && MELODIC(sel)) {   /* a part's page: its balance */
             BALN(sel) = (int8_t)clampi(BALN(sel) + e, -30, 6);
             CHANGED(); redraw = foot = 1;
-        } else if (e && scr == SCR_HOME) {      /* the whole orchestra transposed live, a semitone a click (not saved) */
+        } else if (e && HOMEISH) {              /* the whole orchestra transposed live, a semitone a click (not saved) */
             static char tb[24];
             char *q;
             live_tr = (int8_t)clampi(live_tr + e, -12, 12);
@@ -3898,7 +4157,7 @@ static void app_main(void)
                 curve_t *c = &sc.curve[PK(sel)][PSEL(sel)];
                 if (c->n) { c->p[ptsel].shape = (uint8_t)wrapi((int32_t)c->p[ptsel].shape + e, 4u); CHANGED(); redraw = foot = 1; }
             }
-            else if (scr == SCR_HOME) { sc.tempo = (uint8_t)clampi((int32_t)sc.tempo + e, 30, 240); set_tempo(); head = 1; CHANGED(); }
+            else if (HOMEISH) { sc.tempo = (uint8_t)clampi((int32_t)sc.tempo + e, 30, 240); set_tempo(); head = 1; CHANGED(); }
             else if (scr == SCR_COMP) { sc.comp_on = e > 0; CHANGED(); redraw = 1; }   /* on (right) / off (left) */
             else if (scr == SCR_SETUP && MELODIC(sel)) {   /* a part's page: con sordino (the strings, the brass) */
                 if (INS[sel].ty != TY_OBOE && INS[sel].ty != TY_BSN) {   /* (the winds: KNOB 4 does nothing) */
@@ -3935,7 +4194,7 @@ static void app_main(void)
 
         if (xrec_row != 0xFFu) {                /* a take of expression: a value each step, for one pass of the pattern */
             uint32_t r = xrec_row, c = cur[xrec_ins] % NSTEP, done = 0;
-            if (!run || !rec || play_pat[xrec_ins] % NPAT != xrec_pat || scr != SCR_HOME) done = 1;
+            if (!run || !rec || play_pat[xrec_ins] % NPAT != xrec_pat || !HOMEISH) done = 1;
             else if (c != xrec_last) {
                 xrec_last = (uint8_t)c; xbuf[c] = EXPR(r); xrec_mask |= (uint64_t)1 << c;
                 if (++xrec_n >= plen(xrec_ins, xrec_pat)) done = 1;
@@ -4004,7 +4263,7 @@ static void app_main(void)
                 if (KEY_LOCK && MELODIC(sel)) n = key_lock(n);   /* (scale lock: the key's notes only) */
                 if (MELODIC(sel)) {
                     held[k] = (uint8_t)n; held_by[k] = (uint8_t)sel;
-                    live(sel, n, scr == SCR_HOME ? 2u : cur_dyn | (scr == SCR_EDIT ? ARTW(sel) << 2 : 0u), 1);
+                    live(sel, n, HOMEISH ? 2u : cur_dyn | (scr == SCR_EDIT ? ARTW(sel) << 2 : 0u), 1);
                     if (live_rec) {             /* recorded where the music is (the nearest step) */
                         uint32_t q = play_pat[sel] % NPAT, len = plen(sel, q), st = cur[sel] + (frac >= 128u ? 1u : 0u), j;
                         mstep_t *m;
@@ -4013,7 +4272,7 @@ static void app_main(void)
                         if (!(keys & ~(1u << k) & ~down)) { m->n[0] = m->n[1] = m->n[2] = 0; }   /* (a new chord) */
                         for (j = 0; j < NV && m->n[j] && m->n[j] != n; j++) {}
                         m->n[j < NV ? j : NV - 1u] = (uint8_t)n;
-                        m->len = 1; m->dyn = (uint8_t)((scr == SCR_HOME ? 2u : cur_dyn) | ARTW(sel) << 2);
+                        m->len = 1; m->dyn = (uint8_t)((HOMEISH ? 2u : cur_dyn) | ARTW(sel) << 2);
                         rec_st[k] = (uint8_t)st; rec_q[k] = (uint8_t)q; rec_g[k] = (gnow + 128u) >> 8;
                         rec_tk[sel][st] = rec_take;  /* (written in this take: a later note of it leaves it be) */
                         CHANGED(); redraw = 1;
@@ -4031,7 +4290,7 @@ static void app_main(void)
                 } else if (bk[k] != 255u) {         /* a black key: a drum */
                     if (bk[k] < NDRUM) {
                         uint32_t d = P_BD + bk[k];
-                        live(d, 0, scr == SCR_HOME ? 2u : cur_dyn, 1);
+                        live(d, 0, HOMEISH ? 2u : cur_dyn, 1);
                         if (live_rec) {             /* recorded on the nearest step of the kit's pattern playing */
                             uint32_t q = play_pat[P_BD] % NPAT, st = cur[P_BD] + (frac >= 128u ? 1u : 0u);
                             if (st >= plen(P_BD, q)) st = 0;
@@ -4090,16 +4349,16 @@ static void app_main(void)
         fm1_led_key(BTN_REC, rec || (scr == SCR_SAVE && confirm == 1u));
         fm1_led_key(BTN_SAVE, scr == SCR_SAVE);
         fm1_led_key(BTN_EDIT, scr == SCR_EDIT || scr == SCR_CURVE);
-        fm1_led_key(BTN_HOME, scr == SCR_HOME);
+        fm1_led_key(BTN_HOME, HOMEISH);
         fm1_led_key(BTN_GLO, scr == SCR_MIX || scr == SCR_SONG || scr == SCR_KEY);
-        fm1_led_key(BTN_FX, scr == SCR_SETUP && INS[sel].s == 0u);
-        fm1_led_key(BTN_SEL, scr == SCR_SETUP && INS[sel].s == 1u);
+        fm1_led_key(BTN_FX, (scr == SCR_SETUP && INS[sel].s == 0u) || scr == SCR_JFX);
+        fm1_led_key(BTN_SEL, (scr == SCR_SETUP && INS[sel].s == 1u) || scr == SCR_JART);
         fm1_led_key(BTN_ENV, scr == SCR_SETUP && INS[sel].s == 2u);
         fm1_led_key(BTN_LFO, scr == SCR_SETUP && INS[sel].s == 3u);
         {                                       /* ARP: lit while the part is solo or muted (the kit: all muted) */
             uint32_t m = MUTE(sel) || (MELODIC(sel) && SOLO(sel));
-            if (scr == SCR_HOME && sel_all) for (k = P_BD, m = 1; k < NINS; k++) m &= MUTE(k);
-            fm1_led_key(BTN_ARP, (scr == SCR_HOME || scr == SCR_SETUP) && m);
+            if (HOMEISH && sel_all) for (k = P_BD, m = 1; k < NINS; k++) m &= MUTE(k);
+            fm1_led_key(BTN_ARP, (HOMEISH || scr == SCR_SETUP) && m);
         }
         fm1_led_key(BTN_SEQ, end_req ? (fm1_ms >> 8 & 1u) : scr == SCR_COMP || scr == SCR_COPY || sc.comp_on);   /* (blinking:
                                                    the song will end) */   /* (SEQ: the Composer, and lit on every
@@ -4134,7 +4393,7 @@ static void app_main(void)
         /* ---- the screen: what changed, at most ~30 times a second */
         flash = lit_mask();
         play_now = run ? gstep : ~0u;
-        if (scr == SCR_HOME) { bars = bars_all(); bar = run ? (gstep ? (gstep - 1u) / BAR % bars : 0u) + 1u : 1u; }
+        if (scr == SCR_HOME || scr >= SCR_JAM) { bars = bars_all(); bar = run ? (gstep ? (gstep - 1u) / BAR % bars : 0u) + 1u : 1u; }
         else { bars = (LEN(sel) + BAR - 1u) / BAR; bar = cursor / BAR + 1u; }
         if ((bar | bars << 8) != drawn_bar && scr != SCR_SAVE && scr != SCR_COMP) { drawn_bar = bar | bars << 8; head = 1; }
         if (msg && (int32_t)(fm1_ms - msg_until) > 0) { msg = 0; foot = 1; head = 1; }
@@ -4148,7 +4407,7 @@ static void app_main(void)
                 ctext(44, 5, &SERIF_M, "LOW BATTERY", C_WINE);
                 cv_blit(0, 0);
             }
-            else if (scr == SCR_HOME) draw_status(sel, run, rec, msg);
+            else if (scr == SCR_HOME || scr >= SCR_JAM) draw_status(sel, run, rec, msg);
             else if (scr == SCR_MIX) { title_right = ""; draw_title("MIX", 0, run, rec, 0, 0); }
             else if (scr == SCR_COPY) { title_right = ""; draw_title("COPY INTO", (char)('A' + PSEL(sel)), run, rec, 0, 0); }
             else if (scr == SCR_SONG) { title_right = ""; draw_title("PIECE", 0, run, rec, 0, 0);   /* (the piece page: its time signature, its performance) */ }
@@ -4188,6 +4447,9 @@ static void app_main(void)
                 t_frame = fm1_ms; drawn_flash = flash;
                 draw_orchestra(sel, flash, redraw);
                 redraw = 0;
+            } else if (scr >= SCR_JAM && (redraw || play_now != drawn_play)) {   /* JAM: the tracks (and SCL / FX) */
+                t_frame = fm1_ms; redraw = 0; drawn_play = play_now;
+                draw_jam(scr - SCR_JAM, sel, jbar, run, scr == SCR_JART ? jart : jfx, jfxv);
             } else if (scr == SCR_KEY && redraw) {
                 uint32_t pm = 0;
                 t_frame = fm1_ms; redraw = 0;
@@ -4199,7 +4461,7 @@ static void app_main(void)
             } else if (scr == SCR_COPY && redraw) {
                 t_frame = fm1_ms; redraw = 0;
                 draw_copy(cp_row, cp_pat, PK(sel), PSEL(sel), cp_ask);
-            } else if (scr != SCR_HOME && scr != SCR_SAVE && scr != SCR_COMP && scr != SCR_COPY && scr != SCR_SONG && scr != SCR_KEY && (redraw || play_now != drawn_play || (scr == SCR_CURVE && head))) {
+            } else if (scr != SCR_HOME && scr != SCR_SAVE && scr != SCR_COMP && scr != SCR_COPY && scr != SCR_SONG && scr != SCR_KEY && scr < SCR_JAM && (redraw || play_now != drawn_play || (scr == SCR_CURVE && head))) {
                 t_frame = fm1_ms; redraw = 0; drawn_play = play_now;
                 if (scr == SCR_EDIT && music) draw_music(sel, cursor, run);
                 else if (scr == SCR_EDIT) draw_roll(sel, cursor, run);
@@ -4211,6 +4473,7 @@ static void app_main(void)
         if (foot) {
             foot = 0;
             if (scr == SCR_HOME) {}             /* (the orchestra page: no footer; its header says it) */
+            else if (scr >= SCR_JAM) draw_foot_jam(scr - SCR_JAM, jbar);   /* (its messages: in the header) */
             else if (scr == SCR_SAVE) draw_foot_save(msg);
             else if (scr == SCR_COMP) draw_foot_composer(cbox, msg);
             else if (scr == SCR_SETUP) draw_foot_setup(sel, cursor, cur_dyn, msg);

@@ -39,6 +39,7 @@ run "CONDUCTOR: clear all (REC held, REC again): swing and humanise off, the mix
 run "CONDUCTOR: the KEY page (D major, the music moved, scale lock, the keys lit), trill and tremolo, con sordino, listen alone, the song ending" sh tests/run_host.sh tests/scripts/conductor_key.txt
 run "CONDUCTOR: orchestral terms (tutti, solo, tacet; PERFORMANCE and the tempo marking; PIECE; SECTIONAL; FINE - FERMATA; K3 dynamic)" sh tests/run_host.sh tests/scripts/conductor_terms.txt
 run "CONDUCTOR: ARP says what each player setting means (tutti: whole section, solo: one player, tacet: none); the curve footer" sh tests/run_host.sh tests/scripts/conductor_players.txt
+run "CONDUCTOR: JAM MODE (HOME held): the seven tracks, a bar, SCL its articulation, FX its effects, ARP" sh tests/run_host.sh tests/scripts/conductor_jam.txt
 
 $CC -o "$OUT/ota_test" tests/ota_test.c
 run "M-UPGRADE entry (FM-1)" "$OUT/ota_test" build/conductor.fwsc
